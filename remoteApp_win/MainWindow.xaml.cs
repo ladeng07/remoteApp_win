@@ -1,6 +1,8 @@
-﻿using System;
+﻿using IconDisplayApp;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using IWshRuntimeLibrary;
 
 namespace remoteApp_win
 {
@@ -70,6 +73,50 @@ namespace remoteApp_win
             }
         }
 
+        private void OpenWeChatButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 微信可执行文件路径
+                string weChatPath = @"C:\Users\Public\Desktop\微信.lnk";
 
+                // 启动微信应用程序
+                Process.Start(new ProcessStartInfo(weChatPath) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("无法启动微信应用程序: " + ex.Message);
+            }
+        }
+
+        private void ScanAndDisplayShortcuts(object sender, RoutedEventArgs e)
+        {
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            List<string> shortcutFiles = new List<string>();
+
+            foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
+            {
+                string targetPath = GetShortcutTarget(file);
+                FileInfo fileInfo = new FileInfo(targetPath);
+               
+
+                // 检查目标路径是否为文件
+                if (fileInfo.Exists && !fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                {
+                    shortcutFiles.Add(file);
+                }
+
+            }
+            
+            ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFiles);
+            shortcutWindow.Show();
+        }
+
+        private string GetShortcutTarget(string shortcutPath)
+        {
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+            return shortcut.TargetPath;
+        }
     }
 }

@@ -16,13 +16,15 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
+        <Button Grid.Row="0" Content="扫描并显示图标" Click="ScanAndDisplayShortcuts" Width="100" Height="50" HorizontalAlignment="Left" Margin="20,0,20,0"/>
+
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Name="OpenDesktopButton" Content="打开桌面" Click="OpenDesktopButton_Click" Width="100" Height="50" Margin="20,0,20,0"/>
-            <Button Name="OpenFileButton" Content="选择安装位置" Click="OpenDesktopButton_Click" Width="100" Height="50" Margin="20,0,20,0"/>
+            <Button Name="OpenFileButton" Content="选择安装位置" Click="OpenWeChatButton_Click" Width="100" Height="50" Margin="20,0,20,0"/>
         </StackPanel>
 
         <Border Grid.Row="1" BorderBrush="#FFA49F9F" BorderThickness="1" CornerRadius="5" Margin="10,10,10,10">
-            <WrapPanel  AllowDrop="True" DragEnter="WrapPanel_DragEnter" Drop="WrapPanel_Drop" Background="Green">
+            <WrapPanel x:Name="AppWrapPanel" AllowDrop="True" DragEnter="WrapPanel_DragEnter" Drop="WrapPanel_Drop" Background="Green">
                 <!-- 你的内容 -->
             </WrapPanel>
         </Border>
