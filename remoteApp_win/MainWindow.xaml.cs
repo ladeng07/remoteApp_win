@@ -15,6 +15,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
+
+using NotifyIconWPF = System.Windows.Forms.NotifyIcon;
 using IWshRuntimeLibrary;
 
 namespace remoteApp_win
@@ -24,12 +27,59 @@ namespace remoteApp_win
     /// </summary>
     public partial class MainWindow : Window
     {
+        private NotifyIconWPF _notifyIcon;
         public MainWindow()
         {
             InitializeComponent();
+
+            // 创建托盘图标
+            _notifyIcon = new NotifyIconWPF();
+            _notifyIcon.Icon = new System.Drawing.Icon(@"C:\Users\LMark\Desktop\logo.ico"); // 替换为您的图标路径
+            _notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+            _notifyIcon.Visible = true;
+
+            // 创建托盘图标的右键菜单
+            System.Windows.Forms.ContextMenu contextMenu = new System.Windows.Forms.ContextMenu();
+            System.Windows.Forms.MenuItem restoreMenuItem = new System.Windows.Forms.MenuItem("恢复");
+            restoreMenuItem.Click += RestoreMenuItem_Click;
+            contextMenu.MenuItems.Add(restoreMenuItem);
+            System.Windows.Forms.MenuItem exitMenuItem = new System.Windows.Forms.MenuItem("退出");
+            exitMenuItem.Click += ExitMenuItem_Click;
+            contextMenu.MenuItems.Add(exitMenuItem);
+
+            _notifyIcon.ContextMenu = contextMenu;
         }
 
-        
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // 将窗口最小化到托盘
+            e.Cancel = true;
+            Hide();
+        }
+
+        private void NotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            // 双击托盘图标时恢复窗口
+            Show();
+            WindowState = WindowState.Normal;
+        }
+
+        private void RestoreMenuItem_Click(object sender, EventArgs e)
+        {
+            // 右键菜单中的“恢复”选项
+            Show();
+            WindowState = WindowState.Normal;
+        }
+
+        private void ExitMenuItem_Click(object sender, EventArgs e)
+        {
+            // 右键菜单中的“退出”选项
+            _notifyIcon.Dispose();
+            Close();
+        }
+
+        //托盘图标
+
 
         private void OpenDesktopButton_Click(object sender, RoutedEventArgs e)
         {
