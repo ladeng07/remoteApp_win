@@ -50,6 +50,7 @@ namespace remoteApp_win
             _notifyIcon.ContextMenu = contextMenu;
         }
 
+        //托盘图标
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             // 将窗口最小化到托盘
@@ -78,8 +79,9 @@ namespace remoteApp_win
             Close();
         }
 
-        //托盘图标
+        
 
+        //首页
 
         private void OpenDesktopButton_Click(object sender, RoutedEventArgs e)
         {

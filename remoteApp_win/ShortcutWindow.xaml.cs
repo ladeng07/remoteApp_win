@@ -1,14 +1,58 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using IWshRuntimeLibrary;
 using remoteApp_win;
+using Newtonsoft.Json;
+using System.Windows.Media;
+using System.Windows.Input;
+
 
 namespace IconDisplayApp
 {
+
+    public class AppInfo
+    {
+        public string name { get; set; }
+        public string path { get; set; }
+    }
+    public class AppStackPanel : StackPanel
+    {
+
+        public string AppPath;
+        public string AppName;
+
+
+        // 构造函数
+        public AppStackPanel() : base()
+        {
+            // 可以在构造函数中进行一些初始化操作
+            AppPath = "";
+            AppName = "";
+            Background = Brushes.Transparent;
+        }
+
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+            base.OnMouseEnter(e);
+
+            // 当鼠标进入时改变背景色
+            Background = Brushes.LightGray;
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+
+            // 当鼠标离开时恢复背景色
+            Background = Brushes.Transparent;
+        }
+    }
     public partial class ShortcutWindow : Window
     {
         public ShortcutWindow(List<string> shortcutFiles)
@@ -45,31 +89,31 @@ namespace IconDisplayApp
 
                 MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
-                // 添加事件处理程序，将图标添加到 AppWrapPanel 中
-                shortcutImage.MouseDown += (sender, e) =>
-                {
-                    Image clickedImage = sender as Image;
-                    if (clickedImage != null)
-                    {
-                        StackPanel parentStackPanel = clickedImage.Parent as StackPanel;
-                        if (parentStackPanel != null)
-                        {
-                            ShortcutWrapPanel.Children.Remove(parentStackPanel);
-                            mainWindow.AppWrapPanel.Children.Add(parentStackPanel);
-                        }
-                    }
-                };
-
-
-                StackPanel stackPanel = new StackPanel();
+                AppStackPanel stackPanel = new AppStackPanel();
                 stackPanel.Orientation = Orientation.Vertical;
                 stackPanel.Children.Add(shortcutImage);
                 stackPanel.Children.Add(shortcutText);
+                stackPanel.AppPath = shortcut.TargetPath;
+                stackPanel.AppName = shortcutName;
+
+                //点击事件
+                stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
+                {
+                    AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                    if (clickedStackPanel != null)
+                    {
+                        ShortcutWrapPanel.Children.Remove(clickedStackPanel);
+                        mainWindow.AppWrapPanel.Children.Add(clickedStackPanel);
+
+                        WriteAppWrapPanelContentsToFile();
+                    }
+                };
 
                 ShortcutWrapPanel.Children.Add(stackPanel);
             }
         }
 
+        //从图标获取位图
         private BitmapSource GetBitmapSourceFromIcon(string iconPath)
         {
             string[] splitPath = iconPath.Split(',');
@@ -98,6 +142,32 @@ namespace IconDisplayApp
         private IntPtr ExtractIconFromFile(string filePath, int iconIndex)
         {
             return ExtractIcon(IntPtr.Zero, filePath, iconIndex);
+        }
+
+        private void WriteAppWrapPanelContentsToFile()
+        {
+            StringBuilder contents = new StringBuilder();
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+            List<AppInfo> appInfoList = new List<AppInfo>();
+            // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
+            foreach (UIElement element in mainWindow.AppWrapPanel.Children)
+            {
+                AppStackPanel stackPanel = element as AppStackPanel;
+                if (stackPanel != null)
+                {
+                    AppInfo appInfo = new AppInfo
+                        {
+                            name = stackPanel.AppName,
+                            path = stackPanel.AppPath
+                        };
+
+                    appInfoList.Add(appInfo);
+                }
+            }
+            string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
+            // 将 StringBuilder 中的内容写入文件
+            System.IO.File.WriteAllText(@"D:\list.json", json);
         }
     }
 }
