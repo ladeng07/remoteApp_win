@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AduSkin.Controls.Metro;
 
 
 using NotifyIconWPF = System.Windows.Forms.NotifyIcon;
@@ -25,7 +26,7 @@ namespace remoteApp_win
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         private NotifyIconWPF _notifyIcon;
         public MainWindow()
@@ -34,7 +35,7 @@ namespace remoteApp_win
 
             // 创建托盘图标
             _notifyIcon = new NotifyIconWPF();
-            _notifyIcon.Icon = new System.Drawing.Icon(@"C:\Users\LMark\Desktop\logo.ico"); // 替换为您的图标路径
+            _notifyIcon.Icon = new System.Drawing.Icon("Resources/logo.ico"); // 替换为您的图标路径
             _notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
             _notifyIcon.Visible = true;
 
@@ -169,6 +170,13 @@ namespace remoteApp_win
             WshShell shell = new WshShell();
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
             return shortcut.TargetPath;
+        }
+
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 处理设置按钮点击事件
+            MessageBox.Show("设置按钮点击");
         }
     }
 }

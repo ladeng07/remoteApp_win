@@ -81,8 +81,8 @@ namespace IconDisplayApp
                 TextBlock shortcutText = new TextBlock();
                 shortcutText.Text = shortcutName;
                 shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
-
-                shortcutText.Width= 50;
+                shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                shortcutText.Width= 60;
                 shortcutText.MaxHeight = 4 * shortcutText.FontSize;
                 shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
                 shortcutText.Margin = new Thickness(10);
