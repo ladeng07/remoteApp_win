@@ -23,7 +23,7 @@
 
 
     <Grid Background="{Binding MainBackground}" AllowDrop="True">
-        
+
 
         <AduSkin:AduTabControl  Background="#FFF" SelectedIndex="{Binding SelectedModularIndex}" Margin="0,0,0,1">
             <AduSkin:AduTabControl.Resources>
@@ -46,49 +46,8 @@
                     <ContentControl  Content="{Binding Settings}"/>
                 </Border>
             </AduSkin:AduTabItem>
-           
-
+            
         </AduSkin:AduTabControl>
-
-
-
-
-        <!--<StackPanel Grid.Row="1" Background="#05000000" Height="270" VerticalAlignment="Bottom">
-            <AduSkin:AduFlatButton Content="扫描并显示图标" Click="ScanAndDisplayShortcuts" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>
-            <AduSkin:AduFlatButton Name="OpenDesktopButton" Content="打开桌面" Click="OpenDesktopButton_Click" Width="80" Height="50" Margin="20,20,20,20"/>
-            <AduSkin:AduFlatButton Name="OpenFileButton" Content="选择安装位置" Click="OpenWeChatButton_Click" Width="80" Height="50" Margin="20,20,20,20"/>
-        </StackPanel>
-
-        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ShowControlBorder}"   CornerRadius="5" Margin="10,10,10,10">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="AUTO"/>
-                    -->
-        <!-- 自适应高度，适应TextBlock的大小 -->
-        <!--
-                    <RowDefinition Height="*"/>
-                    -->
-        <!-- 剩余空间全部分配给WrapPanel -->
-        <!--
-                </Grid.RowDefinitions>
-
-                -->
-        <!-- 第一行放置TextBlock -->
-        <!--
-                <TextBlock Text="我的应用" Margin="5"/>
-
-                -->
-        <!-- 第二行放置WrapPanel -->
-        <!--
-                <WrapPanel Grid.Row="1" x:Name="AppWrapPanel" AllowDrop="True" DragEnter="WrapPanel_DragEnter" Drop="WrapPanel_Drop"
-                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-                    -->
-        <!-- 在这里添加 WrapPanel 中的内容 -->
-        <!--
-                </WrapPanel>
-            </Grid>
-
-        </Border>-->
-
+        
     </Grid>
 </AduSkin:MetroWindow>

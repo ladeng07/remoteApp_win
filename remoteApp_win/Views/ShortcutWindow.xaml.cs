@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Windows.Media;
 using System.Windows.Input;
 using remoteApp_win.UserControls;
+using remoteApp_win.ViewModel;
 
 namespace IconDisplayApp
 {
@@ -87,9 +88,12 @@ namespace IconDisplayApp
                 shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
                 shortcutText.Margin = new Thickness(10);
 
-                //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-
-                AppList myUserControl = new AppList();
+                //获取MainWindow实例
+                MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+                
+                //获取数据上下文
+                MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+                UserControl myUserControl = viewModel.Page1;
                 WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
 
                 AppStackPanel stackPanel = new AppStackPanel();
@@ -150,9 +154,13 @@ namespace IconDisplayApp
         private void WriteAppWrapPanelContentsToFile()
         {
             StringBuilder contents = new StringBuilder();
-            //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
 
-            AppList myUserControl = new AppList();
+            //获取MainWindow实例
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+            //获取数据上下文
+            MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+            UserControl myUserControl = viewModel.Page1;
             WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
 
             List<AppInfo> appInfoList = new List<AppInfo>();
