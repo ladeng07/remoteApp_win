@@ -1,11 +1,13 @@
 ﻿using IconDisplayApp;
 using IWshRuntimeLibrary;
 using Newtonsoft.Json;
+using remoteApp_win.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 
+
 namespace remoteApp_win.UserControls
 {
     /// <summary>
@@ -29,10 +32,99 @@ namespace remoteApp_win.UserControls
         public AppList()
         {
             InitializeComponent();
+            LoadAppInfoList();
+
         }
 
-        
+       
 
+        private void LoadAppInfoList()
+        {
+            string filePath = @"D:\list.json";
+            if (System.IO.File.Exists(filePath))
+            {
+                string json = System.IO.File.ReadAllText(filePath);
+                List<AppInfo> appInfoList = JsonConvert.DeserializeObject<List<AppInfo>>(json);
+
+                foreach (AppInfo appInfo in appInfoList)
+                {
+                    AppStackPanel stackPanel = new AppStackPanel
+                    {
+                        AppName = appInfo.Name,
+                        AppPath = appInfo.Path,
+                        Orientation = Orientation.Vertical
+                    };
+
+                    Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
+                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.Path + ",0");
+
+                    shortcutImage.Width = 32;
+                    shortcutImage.Height = 32;
+
+                    shortcutImage.Margin = new Thickness(10);
+
+
+                    TextBlock shortcutText = new TextBlock();
+                    shortcutText.Text = appInfo.Name;
+                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                    shortcutText.Width = 60;
+                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                    shortcutText.Margin = new Thickness(10);
+
+                    stackPanel.Children.Add(shortcutImage);
+                    stackPanel.Children.Add(shortcutText);
+
+                    
+
+                    // 添加点击事件
+                    //stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
+                    //{
+                    //    AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                    //    if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
+                    //    {
+                    //        ShortcutWrapPanel.Children.Remove(clickedStackPanel);
+                    //        AppWrapPanel.Children.Add(clickedStackPanel);
+
+                    //        WriteAppWrapPanelContentsToFile();
+                    //    }
+                    //};
+
+                    AppWrapPanel.Children.Add(stackPanel);
+                }
+            }
+        }
+
+        private BitmapSource GetBitmapSourceFromIcon(string iconPath)
+        {
+            string[] splitPath = iconPath.Split(',');
+            string filePath = splitPath[0];
+            int iconIndex = splitPath.Length > 1 ? int.Parse(splitPath[1]) : 0;
+
+            IntPtr hIcon = ExtractIconFromFile(filePath, iconIndex);
+            if (hIcon == IntPtr.Zero) return null;
+
+            BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                hIcon,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+
+            DestroyIcon(hIcon);
+            return bitmapSource;
+        }
+
+        [DllImport("Shell32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex);
+
+        [DllImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool DestroyIcon(IntPtr hIcon);
+
+        private IntPtr ExtractIconFromFile(string filePath, int iconIndex)
+        {
+            return ExtractIcon(IntPtr.Zero, filePath, iconIndex);
+        }
 
 
 
