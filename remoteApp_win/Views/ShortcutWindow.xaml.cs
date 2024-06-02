@@ -16,18 +16,20 @@ using remoteApp_win.ViewModel;
 
 namespace IconDisplayApp
 {
-
     public class AppInfo
     {
-        public string name { get; set; }
-        public string path { get; set; }
+        public string Name { get; set; }
+        public string Path { get; set; }
     }
+
     public class AppStackPanel : StackPanel
     {
 
         public string AppPath;
         public string AppName;
 
+
+        
 
         // 构造函数
         public AppStackPanel() : base()
@@ -59,7 +61,73 @@ namespace IconDisplayApp
         public ShortcutWindow(List<string> shortcutFiles)
         {
             InitializeComponent();
+            LoadAppInfoList();
             DisplayShortcuts(shortcutFiles);
+        }
+
+        //加载已有App列表
+        private void LoadAppInfoList()
+        {
+            string filePath = @"D:\list.json";
+            if (System.IO.File.Exists(filePath))
+            {
+                string json = System.IO.File.ReadAllText(filePath);
+                List<AppInfo> appInfoList = JsonConvert.DeserializeObject<List<AppInfo>>(json);
+
+                foreach (AppInfo appInfo in appInfoList)
+                {
+                    AppStackPanel stackPanel = new AppStackPanel
+                    {
+                        AppName = appInfo.Name,
+                        AppPath = appInfo.Path,
+                        Orientation = Orientation.Vertical
+                    };
+
+                    Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
+                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.Path + ",0");
+
+                    shortcutImage.Width = 32;
+                    shortcutImage.Height = 32;
+
+                    shortcutImage.Margin = new Thickness(10);
+
+
+                    TextBlock shortcutText = new TextBlock();
+                    shortcutText.Text = appInfo.Name;
+                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                    shortcutText.Width = 60;
+                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                    shortcutText.Margin = new Thickness(10);
+
+                    stackPanel.Children.Add(shortcutImage);
+                    stackPanel.Children.Add(shortcutText);
+
+                    //获取MainWindow实例
+                    MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+                    //获取数据上下文
+                    MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+                    UserControl myUserControl = viewModel.Page1;
+                    WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+                    // 添加点击事件
+                    stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
+                    {
+                        AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                        if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
+                        {
+                            ShortcutWrapPanel.Children.Remove(clickedStackPanel);
+                            AppWrapPanel.Children.Add(clickedStackPanel);
+
+                            WriteAppWrapPanelContentsToFile();
+                        }
+                    };
+
+                    AppWrapPanel.Children.Add(stackPanel);
+                }
+            }
         }
 
         private void DisplayShortcuts(List<string> shortcutFiles)
@@ -99,6 +167,24 @@ namespace IconDisplayApp
                 MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
                 UserControl myUserControl = viewModel.Page1;
                 WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+                // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
+                bool exists = false;
+                foreach (UIElement element in AppWrapPanel.Children)
+                {
+                    AppStackPanel existingPanel = element as AppStackPanel;
+                    if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == shortcut.TargetPath)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (exists)
+                {
+                    // 如果已存在具有相同名称和路径的元素，则跳过
+                    continue;
+                }
 
                 AppStackPanel stackPanel = new AppStackPanel();
                 stackPanel.Orientation = Orientation.Vertical;
@@ -185,8 +271,8 @@ namespace IconDisplayApp
                 {
                     AppInfo appInfo = new AppInfo
                         {
-                            name = stackPanel.AppName,
-                            path = stackPanel.AppPath
+                            Name = stackPanel.AppName,
+                            Path = stackPanel.AppPath
                         };
 
                     appInfoList.Add(appInfo);
