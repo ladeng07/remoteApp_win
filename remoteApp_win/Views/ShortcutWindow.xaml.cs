@@ -73,7 +73,11 @@ namespace IconDisplayApp
                 string shortcutName = System.IO.Path.GetFileNameWithoutExtension(shortcutFile);
 
                 Image shortcutImage = new Image();
-                shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
+
+                string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
+                //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
+                shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
+
                 shortcutImage.Width = 32;
                 shortcutImage.Height = 32;
 
