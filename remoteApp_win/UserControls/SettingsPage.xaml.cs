@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -25,6 +26,10 @@ namespace remoteApp_win.UserControls
         public SettingsPage()
         {
             InitializeComponent();
+            bool enable = IsRemoteDesktopEnabled();
+            remoteDesktopStatus.Text = enable ? "远程桌面已启用" : "远程桌面已禁用";
+            remoteDesktopSwitch.IsChecked = enable;
+
         }
 
 
@@ -67,6 +72,8 @@ namespace remoteApp_win.UserControls
 
             // 设置 "fDenyTSConnections" 键的值为 0 或 1
             Registry.SetValue(keyPath, "fDenyTSConnections", enabled ? 0 : 1);
+
+            remoteDesktopStatus.Text = enabled ? "远程桌面已启用" : "远程桌面已禁用";
         }
     }
 }

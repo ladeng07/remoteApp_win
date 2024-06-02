@@ -10,10 +10,10 @@
 
     <Grid>
 
-        <TextBlock Text="这是一个设置页"/>
-        <StackPanel Grid.Row="1" Background="#05000000" Height="270" VerticalAlignment="Bottom">
+        
+        <StackPanel>
             <AduSkin:AduFlatButton Content="打开设置" Click="OpenRemoteDesktopSettings" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>
-            <AduSkin:MetroSwitch  x:Name="ts" Margin="10" Content="特殊动画" Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
+            <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10" Content="特殊动画" Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
             <TextBlock x:Name="remoteDesktopStatus"/>
         </StackPanel>
     </Grid>
