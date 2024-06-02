@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace remoteApp_win.Views
+namespace remoteApp_win.UserControls
 {
     /// <summary>
-    /// Page1.xaml 的交互逻辑
+    /// SettingsPage.xaml 的交互逻辑
     /// </summary>
-    public partial class Page1 : Page
+    public partial class SettingsPage : UserControl
     {
-        public Page1()
+        public SettingsPage()
         {
             InitializeComponent();
         }

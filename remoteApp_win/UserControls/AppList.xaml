@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="remoteApp_win.UserControls.AppList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:remoteApp_win.UserControls"
+             xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22*"/>
+
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="21*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Background="#05000000" Height="270" VerticalAlignment="Bottom">
+            <AduSkin:AduFlatButton Content="扫描并显示图标" Click="ScanAndDisplayShortcuts" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>
+            <AduSkin:AduFlatButton Name="OpenDesktopButton" Content="打开桌面" Click="OpenDesktopButton_Click" Width="80" Height="50" Margin="20,20,20,20"/>
+            <AduSkin:AduFlatButton Name="OpenFileButton" Content="选择安装位置" Click="OpenWeChatButton_Click" Width="80" Height="50" Margin="20,20,20,20"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ShowControlBorder}"   CornerRadius="5" Margin="10,10,10,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="AUTO"/>
+                    <!-- 自适应高度，适应TextBlock的大小 -->
+                    <RowDefinition Height="*"/>
+                    <!-- 剩余空间全部分配给WrapPanel -->
+                </Grid.RowDefinitions>
+
+                <!-- 第一行放置TextBlock -->
+                <TextBlock Text="我的应用" Margin="5"/>
+
+                <!-- 第二行放置WrapPanel -->
+                <WrapPanel Grid.Row="1" x:Name="AppWrapPanel" AllowDrop="True" DragEnter="WrapPanel_DragEnter" Drop="WrapPanel_Drop"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                    <!-- 在这里添加 WrapPanel 中的内容 -->
+                </WrapPanel>
+            </Grid>
+
+        </Border>
+    </Grid>
+</UserControl>

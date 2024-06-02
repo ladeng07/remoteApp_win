@@ -11,7 +11,7 @@ using remoteApp_win;
 using Newtonsoft.Json;
 using System.Windows.Media;
 using System.Windows.Input;
-
+using remoteApp_win.UserControls;
 
 namespace IconDisplayApp
 {
@@ -87,7 +87,10 @@ namespace IconDisplayApp
                 shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
                 shortcutText.Margin = new Thickness(10);
 
-                MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+                //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+                AppList myUserControl = new AppList();
+                WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
 
                 AppStackPanel stackPanel = new AppStackPanel();
                 stackPanel.Orientation = Orientation.Vertical;
@@ -103,8 +106,8 @@ namespace IconDisplayApp
                     if (clickedStackPanel != null)
                     {
                         ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-                        mainWindow.AppWrapPanel.Children.Add(clickedStackPanel);
-
+                        AppWrapPanel.Children.Add(clickedStackPanel);
+                        
                         WriteAppWrapPanelContentsToFile();
                     }
                 };
@@ -147,11 +150,14 @@ namespace IconDisplayApp
         private void WriteAppWrapPanelContentsToFile()
         {
             StringBuilder contents = new StringBuilder();
-            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+            //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+            AppList myUserControl = new AppList();
+            WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
 
             List<AppInfo> appInfoList = new List<AppInfo>();
             // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
-            foreach (UIElement element in mainWindow.AppWrapPanel.Children)
+            foreach (UIElement element in AppWrapPanel.Children)
             {
                 AppStackPanel stackPanel = element as AppStackPanel;
                 if (stackPanel != null)
