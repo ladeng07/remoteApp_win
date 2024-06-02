@@ -109,6 +109,15 @@ namespace IconDisplayApp
                     AppStackPanel clickedStackPanel = sender as AppStackPanel;
                     if (clickedStackPanel != null)
                     {
+                        var currentParent = VisualTreeHelper.GetParent(clickedStackPanel) as Panel;
+
+                        // 如果当前父级是 AppWrapPanel，则不执行后续操作
+                        if (currentParent == AppWrapPanel)
+                        {   
+                            //TODO:之后给图标添加其他点击事件
+                            return;
+                        }
+
                         ShortcutWrapPanel.Children.Remove(clickedStackPanel);
                         AppWrapPanel.Children.Add(clickedStackPanel);
                         
