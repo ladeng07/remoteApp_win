@@ -1,7 +1,9 @@
-﻿using IconDisplayApp;
+﻿using AduSkin.Controls.Metro;
+using IconDisplayApp;
 using IWshRuntimeLibrary;
 using Newtonsoft.Json;
 using remoteApp_win.ViewModel;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,8 +38,91 @@ namespace remoteApp_win.UserControls
 
         }
 
-       
+        public class AppStackPanel_ : AppStackPanel
+        {
 
+            // 构造函数
+            public AppStackPanel_() : base()
+            {
+                // 订阅 MouseLeftButtonUp 事件
+                MouseLeftButtonUp += DoubleClickStackPanel_MouseLeftButtonUp;
+
+                // 创建右键菜单
+                MetroContextMenu rightClickMenu = new MetroContextMenu();
+                
+                // 添加菜单项
+
+                //设置
+                MetroMenuItem menuSetting = new MetroMenuItem();
+                menuSetting.Header = "设置";
+                menuSetting.Foreground = Brushes.Black;
+                menuSetting.Click += MenuItem_Setting_Click;
+                rightClickMenu.Items.Add(menuSetting);
+
+                //分割线
+                MetroMenuSeparator menuSeparator = new MetroMenuSeparator();
+                rightClickMenu.Items.Add(menuSeparator);
+
+                //删除
+                MetroMenuItem menuDel = new MetroMenuItem();
+                menuDel.Header = "删除";
+                menuDel.Click += MenuItem_Del_Click;
+                rightClickMenu.Items.Add(menuDel);
+
+
+                // 将右键菜单
+                ContextMenu = rightClickMenu;
+            }
+
+
+            //添加并绑定双击事件
+            private const int DoubleClickTimeThreshold = 500; // 定义双击时间阈值（毫秒）
+            private DateTime lastClickTime = DateTime.MinValue;
+
+            public event EventHandler DoubleClick;
+
+            private void DoubleClickStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+            {
+                DateTime now = DateTime.Now;
+                TimeSpan timeSinceLastClick = now - lastClickTime;
+                lastClickTime = now;
+
+                // 如果两次点击的时间间隔小于等于阈值，则认为是双击事件
+                if (timeSinceLastClick.TotalMilliseconds <= DoubleClickTimeThreshold)
+                {
+                    OnDoubleClick();
+                }
+            }
+
+            protected virtual void OnDoubleClick()
+            {
+                // 处理右键菜单中的 "Open" 菜单项点击事件
+                AppStackPanel_ clickedStackPanel = this as AppStackPanel_;
+                if (clickedStackPanel != null)
+                {
+                    Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
+                    // 如果需要在打开时执行其他操作，可以在这里添加代码
+                }
+            }
+
+
+            private void MenuItem_Setting_Click(object sender, RoutedEventArgs e)
+            {
+                //TODO
+            }
+
+            private void MenuItem_Del_Click(object sender, RoutedEventArgs e)
+            {
+                AppStackPanel_ clickedStackPanel = this as AppStackPanel_;
+                Panel parentPanel = clickedStackPanel.Parent as Panel;
+                if (clickedStackPanel != null)
+                {
+                    parentPanel.Children.Remove(clickedStackPanel);
+                }
+            }
+        }
+
+        //从文件打开
         private void LoadAppInfoList()
         {
             string fileName = "list.json";
@@ -50,7 +135,7 @@ namespace remoteApp_win.UserControls
 
                 foreach (AppInfo appInfo in appInfoList)
                 {
-                    AppStackPanel stackPanel = new AppStackPanel
+                    AppStackPanel_ stackPanel = new AppStackPanel_
                     {
                         AppName = appInfo.Name,
                         AppPath = appInfo.Path,
@@ -83,20 +168,11 @@ namespace remoteApp_win.UserControls
 
                     // 添加点击事件
                     stackPanel.DoubleClick += (sender, e) =>
-                    {
-                       
-                            AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                    { 
+                            AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
                             Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
-                        
-                        
-                        //if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
-                        //{
-                        //    ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-                        //    AppWrapPanel.Children.Add(clickedStackPanel);
-
-                        //    WriteAppWrapPanelContentsToFile();
-                        //}
                     };
+
 
                     AppWrapPanel.Children.Add(stackPanel);
                 }
@@ -179,17 +255,47 @@ namespace remoteApp_win.UserControls
 
         private void OpenWeChatButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                // 微信可执行文件路径
-                string weChatPath = @"C:\Users\Public\Desktop\微信.lnk";
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "可执行文件 (*.exe;*.lnk)|*.exe;*.lnk|所有文件 (*.*)|*.*";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-                // 启动微信应用程序
-                Process.Start(new ProcessStartInfo(weChatPath) { UseShellExecute = true });
-            }
-            catch (Exception ex)
+            if (openFileDialog.ShowDialog() == true)
             {
-                MessageBox.Show("无法启动微信应用程序: " + ex.Message);
+                string filePath = openFileDialog.FileName;
+
+                // 检查文件扩展名是否为 .exe 或 .lnk
+                string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
+                if (extension.Equals(".exe") || extension.Equals(".lnk"))
+                {
+                    // 处理 .exe 或 .lnk 文件
+                    MessageBox.Show($"选择了文件：{filePath}");
+
+                    ////获取MainWindow实例
+                    //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+                    ////获取数据上下文
+                    //MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+                    //UserControl myUserControl = viewModel.Page1;
+                    //WrapPanel AppWrapPanel = mainWindow.FindName("AppWrapPanel") as WrapPanel;
+
+                    // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
+                    bool exists = false;
+                    foreach (UIElement element in AppWrapPanel.Children)
+                    {
+                        AppStackPanel_ existingPanel = element as AppStackPanel_;
+                        if (existingPanel != null && existingPanel.AppPath == filePath)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if(exists) MessageBox.Show($"该应用已存在");
+
+                }
+                else
+                {
+                    MessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
+                }
             }
         }
 

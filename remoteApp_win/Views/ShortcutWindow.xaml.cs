@@ -14,6 +14,9 @@ using System.Windows.Input;
 using remoteApp_win.UserControls;
 using remoteApp_win.ViewModel;
 using System.Runtime.InteropServices.ComTypes;
+using System.Diagnostics;
+using AduSkin.Controls.Metro;
+using static remoteApp_win.UserControls.AppList;
 
 namespace IconDisplayApp
 {
@@ -40,8 +43,8 @@ namespace IconDisplayApp
             AppIconPath = "";
             Background = Brushes.Transparent;
 
-            // 订阅 MouseLeftButtonUp 事件
-            MouseLeftButtonUp += DoubleClickStackPanel_MouseLeftButtonUp;
+
+        
         }
 
         protected override void OnMouseEnter(MouseEventArgs e)
@@ -59,34 +62,6 @@ namespace IconDisplayApp
             // 当鼠标离开时恢复背景色
             Background = Brushes.Transparent;
         }
-
-
-        //添加并绑定双击事件
-        private const int DoubleClickTimeThreshold = 500; // 定义双击时间阈值（毫秒）
-        private DateTime lastClickTime = DateTime.MinValue;
-
-        public event EventHandler DoubleClick;
-
-        private void DoubleClickStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            DateTime now = DateTime.Now;
-            TimeSpan timeSinceLastClick = now - lastClickTime;
-            lastClickTime = now;
-
-            // 如果两次点击的时间间隔小于等于阈值，则认为是双击事件
-            if (timeSinceLastClick.TotalMilliseconds <= DoubleClickTimeThreshold)
-            {
-                OnDoubleClick();
-            }
-        }
-
-        protected virtual void OnDoubleClick()
-        {
-            // 触发双击事件
-            DoubleClick?.Invoke(this, EventArgs.Empty);
-        }
-
-
 
 
     }
@@ -142,7 +117,7 @@ namespace IconDisplayApp
                 bool exists = false;
                 foreach (UIElement element in AppWrapPanel.Children)
                 {
-                    AppStackPanel existingPanel = element as AppStackPanel;
+                    AppStackPanel_ existingPanel = element as AppStackPanel_;
                     if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == shortcut.TargetPath)
                     {
                         exists = true;
@@ -180,7 +155,23 @@ namespace IconDisplayApp
                         }
 
                         ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-                        AppWrapPanel.Children.Add(clickedStackPanel);
+
+                        AppStackPanel_ childdStackPanel = new AppStackPanel_();
+                        childdStackPanel.AppPath = clickedStackPanel.AppPath;
+                        childdStackPanel.AppName = clickedStackPanel.AppName;
+                        childdStackPanel.AppIconPath = clickedStackPanel.AppIconPath;
+
+                        // 获取 clickedStackPanel 的父元素
+                        Panel parentPanel = clickedStackPanel.Parent as Panel;
+                        if (parentPanel != null)
+                        {
+                            // 从父元素中移除 clickedStackPanel
+                            parentPanel.Children.Remove(clickedStackPanel);
+                        }
+                        //将AppStackPanel子元素添加到AppStackPanel_中
+                        childdStackPanel.Children.Add(clickedStackPanel);
+
+                        AppWrapPanel.Children.Add(childdStackPanel);
                         
                         WriteAppWrapPanelContentsToFile();
                     }
