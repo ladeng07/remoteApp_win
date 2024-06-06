@@ -253,6 +253,7 @@ namespace remoteApp_win.UserControls
             }
         }
 
+        //从安装目录添加
         private void OpenWeChatButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -293,17 +294,13 @@ namespace remoteApp_win.UserControls
 
                     // Extract icon from EXE file
                     Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
+                    //TODO:打开Docker会找不到
                     BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                         icon.Handle,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromWidthAndHeight(32, 32));
 
                     shortcutImage.Source = bitmapSource;
-
-
-                    //string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
-                    //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
-                    //shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
 
                     shortcutImage.Width = 32;
                     shortcutImage.Height = 32;
@@ -336,6 +333,9 @@ namespace remoteApp_win.UserControls
 
 
                     AppWrapPanel.Children.Add(stackPanel);
+
+                    //刷新文件
+                    WriteAppWrapPanelContentsToFile();
 
                 }
                 else
@@ -392,6 +392,35 @@ namespace remoteApp_win.UserControls
                 }
             }
             else return null;
+        }
+
+        private void WriteAppWrapPanelContentsToFile()
+        {
+            StringBuilder contents = new StringBuilder();
+
+            List<AppInfo> appInfoList = new List<AppInfo>();
+            // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
+            foreach (UIElement element in AppWrapPanel.Children)
+            {
+                AppStackPanel stackPanel = element as AppStackPanel;
+                if (stackPanel != null)
+                {
+                    AppInfo appInfo = new AppInfo
+                    {
+                        Name = stackPanel.AppName,
+                        Path = stackPanel.AppPath,
+                        IconPath = stackPanel.AppIconPath,
+                        Icon = stackPanel.AppIcon
+                    };
+
+                    appInfoList.Add(appInfo);
+                }
+            }
+            string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
+            // 将 StringBuilder 中的内容写入文件
+
+            string fileName = "list.json";
+            System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
         }
     }
 }
