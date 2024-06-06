@@ -267,17 +267,12 @@ namespace remoteApp_win.UserControls
                 string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
                 if (extension.Equals(".exe") || extension.Equals(".lnk"))
                 {
-                    // 处理 .exe 或 .lnk 文件
-                    MessageBox.Show($"选择了文件：{filePath}");
+                    if (extension.Equals(".lnk")) {
+                        WshShell shell = new WshShell();
+                        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(filePath);
+                        filePath = shortcut.TargetPath;
 
-                    ////获取MainWindow实例
-                    //MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-
-                    ////获取数据上下文
-                    //MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
-                    //UserControl myUserControl = viewModel.Page1;
-                    //WrapPanel AppWrapPanel = mainWindow.FindName("AppWrapPanel") as WrapPanel;
-
+                    }
                     // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
                     bool exists = false;
                     foreach (UIElement element in AppWrapPanel.Children)
