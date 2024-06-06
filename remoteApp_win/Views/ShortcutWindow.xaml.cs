@@ -35,6 +35,7 @@ namespace IconDisplayApp
         public string AppPath;
         public string AppName;
         public string AppIconPath;
+        public string AppIcon;
 
         // 构造函数
         public AppStackPanel() : base()
@@ -43,6 +44,7 @@ namespace IconDisplayApp
             AppPath = "";
             AppName = "";
             AppIconPath = "";
+            AppIcon = "";
             Background = Brushes.Transparent;
 
 
@@ -93,8 +95,6 @@ namespace IconDisplayApp
                 //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
                 shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
 
-                string s = ImageSourceToBase64(shortcutImage.Source);
-
                 shortcutImage.Width = 32;
                 shortcutImage.Height = 32;
 
@@ -142,6 +142,7 @@ namespace IconDisplayApp
                 stackPanel.AppPath = shortcut.TargetPath;
                 stackPanel.AppName = shortcutName;
                 stackPanel.AppIconPath = finalLocation;
+                stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
 
                 //点击事件
                 stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
@@ -164,6 +165,7 @@ namespace IconDisplayApp
                         childdStackPanel.AppPath = clickedStackPanel.AppPath;
                         childdStackPanel.AppName = clickedStackPanel.AppName;
                         childdStackPanel.AppIconPath = clickedStackPanel.AppIconPath;
+                        childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
 
                         // 获取 clickedStackPanel 的父元素
                         Panel parentPanel = clickedStackPanel.Parent as Panel;
@@ -177,7 +179,7 @@ namespace IconDisplayApp
 
                         AppWrapPanel.Children.Add(childdStackPanel);
                         
-                        WriteAppWrapPanelContentsToFile(s);
+                        WriteAppWrapPanelContentsToFile();
                     }
                 };
 
@@ -216,7 +218,7 @@ namespace IconDisplayApp
             return ExtractIcon(IntPtr.Zero, filePath, iconIndex);
         }
 
-        private void WriteAppWrapPanelContentsToFile(string s)
+        private void WriteAppWrapPanelContentsToFile()
         {
             StringBuilder contents = new StringBuilder();
 
@@ -240,7 +242,7 @@ namespace IconDisplayApp
                             Name = stackPanel.AppName,
                             Path = stackPanel.AppPath,
                             IconPath = stackPanel.AppIconPath,
-                            Icon = s
+                            Icon = stackPanel.AppIcon
                     };
 
                     appInfoList.Add(appInfo);
