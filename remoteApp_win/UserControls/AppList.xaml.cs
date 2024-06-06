@@ -285,58 +285,59 @@ namespace remoteApp_win.UserControls
                             break;
                         }
                     }
-                    if(exists) MessageBox.Show($"该应用已存在");
-
-
-                    Image shortcutImage = new Image();
-
-                    string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-
-                    // Extract icon from EXE file
-                    Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
-                    //TODO:打开Docker会找不到
-                    BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                        icon.Handle,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromWidthAndHeight(32, 32));
-
-                    shortcutImage.Source = bitmapSource;
-
-                    shortcutImage.Width = 32;
-                    shortcutImage.Height = 32;
-                    shortcutImage.Margin = new Thickness(10);
-
-                    TextBlock shortcutText = new TextBlock();
-                    shortcutText.Text = shortcutName;
-                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
-                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
-                    shortcutText.Width = 60;
-                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
-                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
-                    shortcutText.Margin = new Thickness(10);
-
-                    AppStackPanel_ stackPanel = new AppStackPanel_();
-                    stackPanel.Orientation = Orientation.Vertical;
-                    stackPanel.Children.Add(shortcutImage);
-                    stackPanel.Children.Add(shortcutText);
-                    stackPanel.AppPath = filePath;
-                    stackPanel.AppName = shortcutName;
-                    stackPanel.AppIconPath = filePath;//TODO
-                    stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
-
-                    // 添加点击事件
-                    stackPanel.DoubleClick += (sender_, e_) =>
+                    if (exists) MessageBox.Show($"该应用已存在");
+                    else
                     {
-                        AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
-                        Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
-                    };
+
+                        Image shortcutImage = new Image();
+
+                        string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                        // Extract icon from EXE file
+                        Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
+                        //TODO:打开Docker会找不到
+                        BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromWidthAndHeight(32, 32));
+
+                        shortcutImage.Source = bitmapSource;
+
+                        shortcutImage.Width = 32;
+                        shortcutImage.Height = 32;
+                        shortcutImage.Margin = new Thickness(10);
+
+                        TextBlock shortcutText = new TextBlock();
+                        shortcutText.Text = shortcutName;
+                        shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                        shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                        shortcutText.Width = 60;
+                        shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                        shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                        shortcutText.Margin = new Thickness(10);
+
+                        AppStackPanel_ stackPanel = new AppStackPanel_();
+                        stackPanel.Orientation = Orientation.Vertical;
+                        stackPanel.Children.Add(shortcutImage);
+                        stackPanel.Children.Add(shortcutText);
+                        stackPanel.AppPath = filePath;
+                        stackPanel.AppName = shortcutName;
+                        stackPanel.AppIconPath = filePath;//TODO
+                        stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+
+                        // 添加点击事件
+                        stackPanel.DoubleClick += (sender_, e_) =>
+                        {
+                            AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
+                            Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
+                        };
 
 
-                    AppWrapPanel.Children.Add(stackPanel);
+                        AppWrapPanel.Children.Add(stackPanel);
 
-                    //刷新文件
-                    WriteAppWrapPanelContentsToFile();
-
+                        //刷新文件
+                        WriteAppWrapPanelContentsToFile();
+                    }
                 }
                 else
                 {
