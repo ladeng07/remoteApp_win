@@ -114,10 +114,46 @@ namespace remoteApp_win.UserControls
             private void MenuItem_Del_Click(object sender, RoutedEventArgs e)
             {
                 AppStackPanel_ clickedStackPanel = this as AppStackPanel_;
-                Panel parentPanel = clickedStackPanel.Parent as Panel;
+                WrapPanel parentPanel = clickedStackPanel.Parent as WrapPanel;
                 if (clickedStackPanel != null)
                 {
                     parentPanel.Children.Remove(clickedStackPanel);
+
+                    //这是在AppList外面找AppWrapPanel，得想个优雅的方法判断AppWrapPanel是否直接用
+                    StringBuilder contents = new StringBuilder();
+
+                    //获取MainWindow实例
+                    MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+                    //获取数据上下文
+                    MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+                    UserControl myUserControl = viewModel.Page1;
+                    WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+                    List<AppInfo> appInfoList = new List<AppInfo>();
+                    // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
+                    foreach (UIElement element in AppWrapPanel.Children)
+                    {
+                        AppStackPanel stackPanel = element as AppStackPanel;
+                        if (stackPanel != null)
+                        {
+                            AppInfo appInfo = new AppInfo
+                            {
+                                Name = stackPanel.AppName,
+                                Path = stackPanel.AppPath,
+                                IconPath = stackPanel.AppIconPath,
+                                Icon = stackPanel.AppIcon
+                            };
+
+                            appInfoList.Add(appInfo);
+                        }
+                    }
+                    string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
+                    // 将 StringBuilder 中的内容写入文件
+
+                    string fileName = "list.json";
+                    System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
+                    //到这
                 }
             }
         }
@@ -346,29 +382,56 @@ namespace remoteApp_win.UserControls
             }
         }
 
+        //搜索各个桌面的图标
         private void ScanAndDisplayShortcuts(object sender, RoutedEventArgs e)
         {
             //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string desktopPath = "C:\\Users\\Public\\Desktop";
+            //string desktopPath = "C:\\Users\\Public\\Desktop";
             //TODO：很多桌面路径
 
-            List<string> shortcutFiles = new List<string>();
+            string[] desktopPaths = {
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                @"C:\Users\Public\Desktop"
+                // 添加其他桌面路径
+            };
+            List<List<string>> shortcutFilesList = new List<List<string>>();
 
-            foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
+            foreach (var desktopPath in desktopPaths)
             {
-                string targetPath = GetShortcutTarget(file);
-                FileInfo fileInfo = new FileInfo(targetPath);
+                List<string> shortcutFiles = new List<string>();
 
-
-                // 检查目标路径是否为文件
-                if (fileInfo.Exists && !fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
                 {
-                    shortcutFiles.Add(file);
+                    string targetPath = GetShortcutTarget(file);
+                    FileInfo fileInfo = new FileInfo(targetPath);
+
+                    // 检查目标路径是否为文件
+                    if (fileInfo.Exists && !fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+                    {
+                        shortcutFiles.Add(file);
+                    }
                 }
 
+                shortcutFilesList.Add(shortcutFiles);
             }
 
-            ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFiles);
+            //List<string> shortcutFiles = new List<string>();
+
+            //foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
+            //{
+            //    string targetPath = GetShortcutTarget(file);
+            //    FileInfo fileInfo = new FileInfo(targetPath);
+
+
+            //    // 检查目标路径是否为文件
+            //    if (fileInfo.Exists && !fileInfo.Attributes.HasFlag(FileAttributes.Directory))
+            //    {
+            //        shortcutFiles.Add(file);
+            //    }
+
+            //}
+
+            ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFilesList);
             shortcutWindow.Show();
         }
 

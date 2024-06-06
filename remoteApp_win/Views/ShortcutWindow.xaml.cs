@@ -71,118 +71,128 @@ namespace IconDisplayApp
     }
     public partial class ShortcutWindow : Window
     {
-        public ShortcutWindow(List<string> shortcutFiles)
+        public ShortcutWindow(List<List<string>> shortcutFiles)
         {
             InitializeComponent();
             DisplayShortcuts(shortcutFiles);
         }
  
 
-        private void DisplayShortcuts(List<string> shortcutFiles)
+        private void DisplayShortcuts(List<List<string>> desktopShortcuts)
         {
-            foreach (var shortcutFile in shortcutFiles)
+            // 存储 WrapPanel 的列表
+            List<WrapPanel> wrapPanels = new List<WrapPanel> { ShortcutWrapPanel, ShortcutWrapPanel2 };
+            int currentPanelIndex = 0; // 当前使用的 WrapPanel 索引
+
+            foreach (var shortcutFiles in desktopShortcuts)
             {
-                WshShell shell = new WshShell();
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutFile);
-
-                string iconLocation = shortcut.IconLocation;
-                string shortcutName = System.IO.Path.GetFileNameWithoutExtension(shortcutFile);
-
-                Image shortcutImage = new Image();
-
-                string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
-                //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
-                shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
-
-                shortcutImage.Width = 32;
-                shortcutImage.Height = 32;
-
-                shortcutImage.Margin = new Thickness(10);
-
-                TextBlock shortcutText = new TextBlock();
-                shortcutText.Text = shortcutName;
-                shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
-                shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
-                shortcutText.Width= 60;
-                shortcutText.MaxHeight = 4 * shortcutText.FontSize;
-                shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
-                shortcutText.Margin = new Thickness(10);
-
-                //获取MainWindow实例
-                MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-                
-                //获取数据上下文
-                MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
-                UserControl myUserControl = viewModel.Page1;
-                WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
-
-                // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
-                bool exists = false;
-                foreach (UIElement element in AppWrapPanel.Children)
+                foreach (var shortcutFile in shortcutFiles)
                 {
-                    AppStackPanel_ existingPanel = element as AppStackPanel_;
-                    if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == shortcut.TargetPath)
+                    WshShell shell = new WshShell();
+                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutFile);
+
+                    string iconLocation = shortcut.IconLocation;
+                    string shortcutName = System.IO.Path.GetFileNameWithoutExtension(shortcutFile);
+
+                    Image shortcutImage = new Image();
+
+                    string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
+                    //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
+                    shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
+
+                    shortcutImage.Width = 32;
+                    shortcutImage.Height = 32;
+
+                    shortcutImage.Margin = new Thickness(10);
+
+                    TextBlock shortcutText = new TextBlock();
+                    shortcutText.Text = shortcutName;
+                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                    shortcutText.Width = 60;
+                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                    shortcutText.Margin = new Thickness(10);
+
+                    //获取MainWindow实例
+                    MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+                    //获取数据上下文
+                    MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+                    UserControl myUserControl = viewModel.Page1;
+                    WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+                    // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
+                    bool exists = false;
+                    foreach (UIElement element in AppWrapPanel.Children)
                     {
-                        exists = true;
-                        break;
-                    }
-                }
-
-                if (exists)
-                {
-                    // 如果已存在具有相同名称和路径的元素，则跳过
-                    continue;
-                }
-
-                AppStackPanel stackPanel = new AppStackPanel();
-                stackPanel.Orientation = Orientation.Vertical;
-                stackPanel.Children.Add(shortcutImage);
-                stackPanel.Children.Add(shortcutText);
-                stackPanel.AppPath = shortcut.TargetPath;
-                stackPanel.AppName = shortcutName;
-                stackPanel.AppIconPath = finalLocation;
-                stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
-
-                //点击事件
-                stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
-                {
-                    AppStackPanel clickedStackPanel = sender as AppStackPanel;
-                    if (clickedStackPanel != null)
-                    {
-                        var currentParent = VisualTreeHelper.GetParent(clickedStackPanel) as Panel;
-
-                        // 如果当前父级是 AppWrapPanel，则不执行后续操作
-                        if (currentParent == AppWrapPanel)
-                        {   
-                            //TODO:之后给图标添加其他点击事件
-                            return;
-                        }
-
-                        ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-
-                        AppStackPanel_ childdStackPanel = new AppStackPanel_();
-                        childdStackPanel.AppPath = clickedStackPanel.AppPath;
-                        childdStackPanel.AppName = clickedStackPanel.AppName;
-                        childdStackPanel.AppIconPath = clickedStackPanel.AppIconPath;
-                        childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
-
-                        // 获取 clickedStackPanel 的父元素
-                        Panel parentPanel = clickedStackPanel.Parent as Panel;
-                        if (parentPanel != null)
+                        AppStackPanel_ existingPanel = element as AppStackPanel_;
+                        if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == shortcut.TargetPath)
                         {
-                            // 从父元素中移除 clickedStackPanel
-                            parentPanel.Children.Remove(clickedStackPanel);
+                            exists = true;
+                            break;
                         }
-                        //将AppStackPanel子元素添加到AppStackPanel_中
-                        childdStackPanel.Children.Add(clickedStackPanel);
-
-                        AppWrapPanel.Children.Add(childdStackPanel);
-                        
-                        WriteAppWrapPanelContentsToFile();
                     }
-                };
 
-                ShortcutWrapPanel.Children.Add(stackPanel);
+                    if (exists)
+                    {
+                        // 如果已存在具有相同名称和路径的元素，则跳过
+                        continue;
+                    }
+
+                    AppStackPanel stackPanel = new AppStackPanel();
+                    stackPanel.Orientation = Orientation.Vertical;
+                    stackPanel.Children.Add(shortcutImage);
+                    stackPanel.Children.Add(shortcutText);
+                    stackPanel.AppPath = shortcut.TargetPath;
+                    stackPanel.AppName = shortcutName;
+                    stackPanel.AppIconPath = finalLocation;
+                    stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+                    int temp = currentPanelIndex;
+                    //点击事件
+                    stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
+                    {
+                        AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                        if (clickedStackPanel != null)
+                        {
+                            var currentParent = VisualTreeHelper.GetParent(clickedStackPanel) as Panel;
+
+                            // 如果当前父级是 AppWrapPanel，则不执行后续操作
+                            if (currentParent == AppWrapPanel)
+                            {
+                                //TODO:之后给图标添加其他点击事件
+                                return;
+                            }
+
+
+                            wrapPanels[temp].Children.Remove(clickedStackPanel);
+
+                            AppStackPanel_ childdStackPanel = new AppStackPanel_();
+                            childdStackPanel.AppPath = clickedStackPanel.AppPath;
+                            childdStackPanel.AppName = clickedStackPanel.AppName;
+                            childdStackPanel.AppIconPath = clickedStackPanel.AppIconPath;
+                            childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
+
+                            // 获取 clickedStackPanel 的父元素
+                            Panel parentPanel = clickedStackPanel.Parent as Panel;
+                            if (parentPanel != null)
+                            {
+                                // 从父元素中移除 clickedStackPanel
+                                parentPanel.Children.Remove(clickedStackPanel);
+                            }
+                            //将AppStackPanel子元素添加到AppStackPanel_中
+                            childdStackPanel.Children.Add(clickedStackPanel);
+
+                            AppWrapPanel.Children.Add(childdStackPanel);
+
+                            WriteAppWrapPanelContentsToFile();
+                        }
+                    };
+
+                    wrapPanels[temp].Children.Add(stackPanel);
+                    
+                }
+                currentPanelIndex++;
             }
         }
 
