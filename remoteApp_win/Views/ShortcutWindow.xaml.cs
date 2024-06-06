@@ -74,7 +74,6 @@ namespace IconDisplayApp
         public ShortcutWindow(List<string> shortcutFiles)
         {
             InitializeComponent();
-            //LoadAppInfoList();
             DisplayShortcuts(shortcutFiles);
         }
  

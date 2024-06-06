@@ -21,7 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Icon = System.Drawing.Icon;
 
 
 namespace remoteApp_win.UserControls
@@ -268,9 +268,9 @@ namespace remoteApp_win.UserControls
                 if (extension.Equals(".exe") || extension.Equals(".lnk"))
                 {
                     if (extension.Equals(".lnk")) {
-                        WshShell shell = new WshShell();
-                        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(filePath);
-                        filePath = shortcut.TargetPath;
+                        WshShell shell_ = new WshShell();
+                        IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
+                        filePath = shortcut_.TargetPath;
 
                     }
                     // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
@@ -286,6 +286,57 @@ namespace remoteApp_win.UserControls
                     }
                     if(exists) MessageBox.Show($"该应用已存在");
 
+
+                    Image shortcutImage = new Image();
+
+                    string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                    // Extract icon from EXE file
+                    Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
+                    BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                        icon.Handle,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromWidthAndHeight(32, 32));
+
+                    shortcutImage.Source = bitmapSource;
+
+
+                    //string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
+                    //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
+                    //shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
+
+                    shortcutImage.Width = 32;
+                    shortcutImage.Height = 32;
+                    shortcutImage.Margin = new Thickness(10);
+
+                    TextBlock shortcutText = new TextBlock();
+                    shortcutText.Text = shortcutName;
+                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                    shortcutText.Width = 60;
+                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                    shortcutText.Margin = new Thickness(10);
+
+                    AppStackPanel_ stackPanel = new AppStackPanel_();
+                    stackPanel.Orientation = Orientation.Vertical;
+                    stackPanel.Children.Add(shortcutImage);
+                    stackPanel.Children.Add(shortcutText);
+                    stackPanel.AppPath = filePath;
+                    stackPanel.AppName = shortcutName;
+                    stackPanel.AppIconPath = filePath;//TODO
+                    stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+
+                    // 添加点击事件
+                    stackPanel.DoubleClick += (sender_, e_) =>
+                    {
+                        AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
+                        Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
+                    };
+
+
+                    AppWrapPanel.Children.Add(stackPanel);
+
                 }
                 else
                 {
@@ -296,7 +347,10 @@ namespace remoteApp_win.UserControls
 
         private void ScanAndDisplayShortcuts(object sender, RoutedEventArgs e)
         {
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktopPath = "C:\\Users\\Public\\Desktop";
+            //TODO：很多桌面路径
+
             List<string> shortcutFiles = new List<string>();
 
             foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
@@ -322,6 +376,22 @@ namespace remoteApp_win.UserControls
             WshShell shell = new WshShell();
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
             return shortcut.TargetPath;
+        }
+
+        private string ImageSourceToBase64(ImageSource imageSource)
+        {
+            if (imageSource != null)
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    BitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource));
+                    encoder.Save(memoryStream);
+                    byte[] imageBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(imageBytes);
+                }
+            }
+            else return null;
         }
     }
 }
