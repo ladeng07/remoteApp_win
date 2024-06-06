@@ -13,17 +13,23 @@
 
         
         <StackPanel>
-            <AduSkin:AduFlatButton Content="打开设置" Click="OpenRemoteDesktopSettings" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>
-            <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10" Content="远程桌面开关" Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
-            <TextBlock x:Name="remoteDesktopStatus"/>
-            <AduSkin:AduComboBox x:Name="remoteDesktopTime" Loaded="remoteDesktopTimeLoaded" SelectionChanged="remoteDesktopTimeChanged" Height="30" IsEditable="True"  Background="Transparent" Margin="10,10,0,10">
+            <!--<AduSkin:AduFlatButton Content="打开设置" Click="OpenRemoteDesktopSettings" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>-->
+            <AduSkin:AduFormLable Title="远程桌面状态" Margin="0,10,0,0">
+            <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10"  Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
+            </AduSkin:AduFormLable>
+                <!--<TextBlock x:Name="remoteDesktopTimeText" Text="会话保持时间"/>-->
+            <AduSkin:AduFormLable Title="会话保持时间" Margin="0,10,0,0">
+              
+            
+            <AduSkin:AduComboBox x:Name="remoteDesktopTime" Loaded="remoteDesktopTimeLoaded" SelectionChanged="remoteDesktopTimeChanged" Height="30" Width="200" IsEditable="True"  Background="Transparent" Margin="10,10,0,10" HorizontalAlignment="Right">
                 <ComboBoxItem>3000</ComboBoxItem>
                 <ComboBoxItem>50000</ComboBoxItem>
                 <ComboBoxItem>50000</ComboBoxItem>
                 <ComboBoxItem>50000</ComboBoxItem>
+            
 
-                
             </AduSkin:AduComboBox>
+            </AduSkin:AduFormLable>
         </StackPanel>
     </Grid>
     

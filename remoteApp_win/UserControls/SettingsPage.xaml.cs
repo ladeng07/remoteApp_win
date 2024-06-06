@@ -28,7 +28,7 @@ namespace remoteApp_win.UserControls
         {
             InitializeComponent();
             bool enable = IsRemoteDesktopEnabled();
-            remoteDesktopStatus.Text = enable ? "远程桌面已启用" : "远程桌面已禁用";
+            remoteDesktopSwitch.Content = enable ? "启用" : "关闭";
             remoteDesktopSwitch.IsChecked = enable;
 
         }
@@ -74,7 +74,7 @@ namespace remoteApp_win.UserControls
             // 设置 "fDenyTSConnections" 键的值为 0 或 1
             Registry.SetValue(keyPath, "fDenyTSConnections", enabled ? 0 : 1);
 
-            remoteDesktopStatus.Text = enabled ? "远程桌面已启用" : "远程桌面已禁用";
+            remoteDesktopSwitch.Content = enabled ? "启用" : "关闭";
         }
 
         private void remoteDesktopTimeChanged(object sender, RoutedEventArgs e)
@@ -112,6 +112,13 @@ namespace remoteApp_win.UserControls
             }
             
             return value;
+        }
+
+        //查看lxz的server是否存活
+        public bool IsProcessRunning(string processName)
+        {
+            Process[] processes = Process.GetProcessesByName(processName);
+            return processes.Length > 0;
         }
     }
  }
