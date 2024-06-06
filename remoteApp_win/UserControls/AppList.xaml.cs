@@ -176,6 +176,7 @@ namespace remoteApp_win.UserControls
                         AppName = appInfo.Name,
                         AppPath = appInfo.Path,
                         AppIconPath = appInfo.IconPath,
+                        AppIcon = appInfo.Icon,
                         Orientation = Orientation.Vertical
                     };
 
@@ -385,14 +386,11 @@ namespace remoteApp_win.UserControls
         //搜索各个桌面的图标
         private void ScanAndDisplayShortcuts(object sender, RoutedEventArgs e)
         {
-            //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            //string desktopPath = "C:\\Users\\Public\\Desktop";
-            //TODO：很多桌面路径
 
             string[] desktopPaths = {
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 @"C:\Users\Public\Desktop"
-                // 添加其他桌面路径
+                // TODO添加其他桌面路径
             };
             List<List<string>> shortcutFilesList = new List<List<string>>();
 
@@ -415,21 +413,6 @@ namespace remoteApp_win.UserControls
                 shortcutFilesList.Add(shortcutFiles);
             }
 
-            //List<string> shortcutFiles = new List<string>();
-
-            //foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
-            //{
-            //    string targetPath = GetShortcutTarget(file);
-            //    FileInfo fileInfo = new FileInfo(targetPath);
-
-
-            //    // 检查目标路径是否为文件
-            //    if (fileInfo.Exists && !fileInfo.Attributes.HasFlag(FileAttributes.Directory))
-            //    {
-            //        shortcutFiles.Add(file);
-            //    }
-
-            //}
 
             ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFilesList);
             shortcutWindow.Show();

@@ -148,6 +148,8 @@ namespace IconDisplayApp
                     stackPanel.AppName = shortcutName;
                     stackPanel.AppIconPath = finalLocation;
                     stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+
+                    //获取当前桌面下标
                     int temp = currentPanelIndex;
                     //点击事件
                     stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
@@ -163,7 +165,6 @@ namespace IconDisplayApp
                                 //TODO:之后给图标添加其他点击事件
                                 return;
                             }
-
 
                             wrapPanels[temp].Children.Remove(clickedStackPanel);
 
