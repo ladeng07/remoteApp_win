@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:remoteApp_win.UserControls"
              xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
+             xmlns:AduAttach="clr-namespace:AduSkin.Controls.Attach;assembly=AduSkin"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -13,8 +14,16 @@
         
         <StackPanel>
             <AduSkin:AduFlatButton Content="打开设置" Click="OpenRemoteDesktopSettings" Width="80" Height="50" HorizontalAlignment="Left" Margin="20,20,20,20"/>
-            <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10" Content="特殊动画" Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
+            <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10" Content="远程桌面开关" Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
             <TextBlock x:Name="remoteDesktopStatus"/>
+            <AduSkin:AduComboBox x:Name="remoteDesktopTime" Loaded="remoteDesktopTimeLoaded" SelectionChanged="remoteDesktopTimeChanged" Height="30" IsEditable="True"  Background="Transparent" Margin="10,10,0,10">
+                <ComboBoxItem>3000</ComboBoxItem>
+                <ComboBoxItem>50000</ComboBoxItem>
+                <ComboBoxItem>50000</ComboBoxItem>
+                <ComboBoxItem>50000</ComboBoxItem>
+
+                
+            </AduSkin:AduComboBox>
         </StackPanel>
     </Grid>
     

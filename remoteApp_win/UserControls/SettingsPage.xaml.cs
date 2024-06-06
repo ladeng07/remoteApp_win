@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AduSkin.Controls.Metro;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -75,5 +76,42 @@ namespace remoteApp_win.UserControls
 
             remoteDesktopStatus.Text = enabled ? "远程桌面已启用" : "远程桌面已禁用";
         }
+
+        private void remoteDesktopTimeChanged(object sender, RoutedEventArgs e)
+        {
+            //TODO
+
+        }
+
+        private void remoteDesktopTimeLoaded(object sender, RoutedEventArgs e)
+        {
+            // 获取ComboBox
+            AduComboBox comboBox = (AduComboBox)sender;
+
+            // 读取注册表中的值
+            int registryValue = ReadRegistryValue();
+
+            // 将注册表的值添加到ComboBox的第一个位置
+            comboBox.Items.Insert(0, registryValue);
+
+            // 设置默认选中项为第一个项
+            comboBox.SelectedIndex = 0;
+        }
+
+        // 从注册表中读取DWORD值的方法
+        private int ReadRegistryValue()
+        {
+            int value = 0;
+
+         
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services");
+            if (key != null)
+            {
+                value = (int)key.GetValue("RemoteAppLogoffTimeLimit", 0);
+                key.Close();
+            }
+            
+            return value;
+        }
     }
-}
+ }
