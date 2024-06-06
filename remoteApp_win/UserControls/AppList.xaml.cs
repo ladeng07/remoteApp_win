@@ -40,7 +40,9 @@ namespace remoteApp_win.UserControls
 
         private void LoadAppInfoList()
         {
-            string filePath = @"D:\list.json";
+            string fileName = "list.json";
+            string filePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+
             if (System.IO.File.Exists(filePath))
             {
                 string json = System.IO.File.ReadAllText(filePath);
@@ -52,11 +54,12 @@ namespace remoteApp_win.UserControls
                     {
                         AppName = appInfo.Name,
                         AppPath = appInfo.Path,
+                        AppIconPath = appInfo.IconPath,
                         Orientation = Orientation.Vertical
                     };
 
                     Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
-                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.Path + ",0");
+                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.IconPath);
 
                     shortcutImage.Width = 32;
                     shortcutImage.Height = 32;
@@ -76,20 +79,24 @@ namespace remoteApp_win.UserControls
                     stackPanel.Children.Add(shortcutImage);
                     stackPanel.Children.Add(shortcutText);
 
-                    
+
 
                     // 添加点击事件
-                    //stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
-                    //{
-                    //    AppStackPanel clickedStackPanel = sender as AppStackPanel;
-                    //    if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
-                    //    {
-                    //        ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-                    //        AppWrapPanel.Children.Add(clickedStackPanel);
+                    stackPanel.DoubleClick += (sender, e) =>
+                    {
+                       
+                            AppStackPanel clickedStackPanel = sender as AppStackPanel;
+                            Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
+                        
+                        
+                        //if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
+                        //{
+                        //    ShortcutWrapPanel.Children.Remove(clickedStackPanel);
+                        //    AppWrapPanel.Children.Add(clickedStackPanel);
 
-                    //        WriteAppWrapPanelContentsToFile();
-                    //    }
-                    //};
+                        //    WriteAppWrapPanelContentsToFile();
+                        //}
+                    };
 
                     AppWrapPanel.Children.Add(stackPanel);
                 }

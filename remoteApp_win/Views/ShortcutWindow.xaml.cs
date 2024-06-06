@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using remoteApp_win.UserControls;
 using remoteApp_win.ViewModel;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace IconDisplayApp
 {
@@ -20,6 +21,7 @@ namespace IconDisplayApp
     {
         public string Name { get; set; }
         public string Path { get; set; }
+        public string IconPath { get; set; }
     }
 
     public class AppStackPanel : StackPanel
@@ -27,9 +29,7 @@ namespace IconDisplayApp
 
         public string AppPath;
         public string AppName;
-
-
-        
+        public string AppIconPath;
 
         // 构造函数
         public AppStackPanel() : base()
@@ -37,7 +37,11 @@ namespace IconDisplayApp
             // 可以在构造函数中进行一些初始化操作
             AppPath = "";
             AppName = "";
+            AppIconPath = "";
             Background = Brushes.Transparent;
+
+            // 订阅 MouseLeftButtonUp 事件
+            MouseLeftButtonUp += DoubleClickStackPanel_MouseLeftButtonUp;
         }
 
         protected override void OnMouseEnter(MouseEventArgs e)
@@ -55,6 +59,36 @@ namespace IconDisplayApp
             // 当鼠标离开时恢复背景色
             Background = Brushes.Transparent;
         }
+
+
+        //添加并绑定双击事件
+        private const int DoubleClickTimeThreshold = 500; // 定义双击时间阈值（毫秒）
+        private DateTime lastClickTime = DateTime.MinValue;
+
+        public event EventHandler DoubleClick;
+
+        private void DoubleClickStackPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            DateTime now = DateTime.Now;
+            TimeSpan timeSinceLastClick = now - lastClickTime;
+            lastClickTime = now;
+
+            // 如果两次点击的时间间隔小于等于阈值，则认为是双击事件
+            if (timeSinceLastClick.TotalMilliseconds <= DoubleClickTimeThreshold)
+            {
+                OnDoubleClick();
+            }
+        }
+
+        protected virtual void OnDoubleClick()
+        {
+            // 触发双击事件
+            DoubleClick?.Invoke(this, EventArgs.Empty);
+        }
+
+
+
+
     }
     public partial class ShortcutWindow : Window
     {
@@ -64,71 +98,7 @@ namespace IconDisplayApp
             //LoadAppInfoList();
             DisplayShortcuts(shortcutFiles);
         }
-
-        //加载已有App列表
-        private void LoadAppInfoList()
-        {
-            string filePath = @"D:\list.json";
-            if (System.IO.File.Exists(filePath))
-            {
-                string json = System.IO.File.ReadAllText(filePath);
-                List<AppInfo> appInfoList = JsonConvert.DeserializeObject<List<AppInfo>>(json);
-
-                foreach (AppInfo appInfo in appInfoList)
-                {
-                    AppStackPanel stackPanel = new AppStackPanel
-                    {
-                        AppName = appInfo.Name,
-                        AppPath = appInfo.Path,
-                        Orientation = Orientation.Vertical
-                    };
-
-                    Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
-                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.Path + ",0");
-
-                    shortcutImage.Width = 32;
-                    shortcutImage.Height = 32;
-
-                    shortcutImage.Margin = new Thickness(10);
-
-
-                    TextBlock shortcutText = new TextBlock();
-                    shortcutText.Text = appInfo.Name;
-                    shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
-                    shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
-                    shortcutText.Width = 60;
-                    shortcutText.MaxHeight = 4 * shortcutText.FontSize;
-                    shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
-                    shortcutText.Margin = new Thickness(10);
-
-                    stackPanel.Children.Add(shortcutImage);
-                    stackPanel.Children.Add(shortcutText);
-
-                    //获取MainWindow实例
-                    MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-
-                    //获取数据上下文
-                    MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
-                    UserControl myUserControl = viewModel.Page1;
-                    WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
-
-                    // 添加点击事件
-                    stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
-                    {
-                        AppStackPanel clickedStackPanel = sender as AppStackPanel;
-                        if (clickedStackPanel != null && clickedStackPanel.Parent != AppWrapPanel)
-                        {
-                            ShortcutWrapPanel.Children.Remove(clickedStackPanel);
-                            AppWrapPanel.Children.Add(clickedStackPanel);
-
-                            WriteAppWrapPanelContentsToFile();
-                        }
-                    };
-
-                    AppWrapPanel.Children.Add(stackPanel);
-                }
-            }
-        }
+ 
 
         private void DisplayShortcuts(List<string> shortcutFiles)
         {
@@ -192,6 +162,7 @@ namespace IconDisplayApp
                 stackPanel.Children.Add(shortcutText);
                 stackPanel.AppPath = shortcut.TargetPath;
                 stackPanel.AppName = shortcutName;
+                stackPanel.AppIconPath = finalLocation;
 
                 //点击事件
                 stackPanel.PreviewMouseLeftButtonUp += (sender, e) =>
@@ -272,15 +243,18 @@ namespace IconDisplayApp
                     AppInfo appInfo = new AppInfo
                         {
                             Name = stackPanel.AppName,
-                            Path = stackPanel.AppPath
-                        };
+                            Path = stackPanel.AppPath,
+                            IconPath = stackPanel.AppIconPath
+                    };
 
                     appInfoList.Add(appInfo);
                 }
             }
             string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
             // 将 StringBuilder 中的内容写入文件
-            System.IO.File.WriteAllText(@"D:\list.json", json);
+
+            string fileName = "list.json";
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
         }
     }
 }
