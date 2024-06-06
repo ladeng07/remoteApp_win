@@ -25,6 +25,8 @@ namespace IconDisplayApp
         public string Name { get; set; }
         public string Path { get; set; }
         public string IconPath { get; set; }
+
+        public string Icon { get; set; }
     }
 
     public class AppStackPanel : StackPanel
@@ -90,6 +92,8 @@ namespace IconDisplayApp
                 string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
                 //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
                 shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
+
+                string s = ImageSourceToBase64(shortcutImage.Source);
 
                 shortcutImage.Width = 32;
                 shortcutImage.Height = 32;
@@ -173,7 +177,7 @@ namespace IconDisplayApp
 
                         AppWrapPanel.Children.Add(childdStackPanel);
                         
-                        WriteAppWrapPanelContentsToFile();
+                        WriteAppWrapPanelContentsToFile(s);
                     }
                 };
 
@@ -212,7 +216,7 @@ namespace IconDisplayApp
             return ExtractIcon(IntPtr.Zero, filePath, iconIndex);
         }
 
-        private void WriteAppWrapPanelContentsToFile()
+        private void WriteAppWrapPanelContentsToFile(string s)
         {
             StringBuilder contents = new StringBuilder();
 
@@ -235,7 +239,8 @@ namespace IconDisplayApp
                         {
                             Name = stackPanel.AppName,
                             Path = stackPanel.AppPath,
-                            IconPath = stackPanel.AppIconPath
+                            IconPath = stackPanel.AppIconPath,
+                            Icon = s
                     };
 
                     appInfoList.Add(appInfo);
@@ -247,5 +252,20 @@ namespace IconDisplayApp
             string fileName = "list.json";
             System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
         }
+
+        //将图片转换为base64
+        private string ImageSourceToBase64(ImageSource imageSource)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource));
+                encoder.Save(memoryStream);
+                byte[] imageBytes = memoryStream.ToArray();
+                return Convert.ToBase64String(imageBytes);
+            }
+        }
+
+
     }
 }
