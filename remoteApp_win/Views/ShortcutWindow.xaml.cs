@@ -182,9 +182,9 @@ namespace IconDisplayApp
                                 parentPanel.Children.Remove(clickedStackPanel);
                             }
                             //将AppStackPanel子元素添加到AppStackPanel_中
-                            childdStackPanel.Children.Add(clickedStackPanel);
+                            //childdStackPanel.Children.Add(clickedStackPanel);
 
-                            AppWrapPanel.Children.Add(childdStackPanel);
+                            AppWrapPanel.Children.Add(clickedStackPanel);
 
                             WriteAppWrapPanelContentsToFile();
                         }

@@ -38,7 +38,7 @@
                 
                 
                         <!-- 第一行放置TextBlock -->
-                <TextBlock Text="我的应用" Margin="5"/>
+                <TextBlock Text="我的应用" Margin="5" Foreground="Aqua"/>
 
                 <!-- 第二行放置WrapPanel -->
                 <ScrollViewer Grid.Row="1" Template="{StaticResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto">
