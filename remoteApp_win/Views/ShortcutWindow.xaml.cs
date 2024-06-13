@@ -69,7 +69,7 @@ namespace IconDisplayApp
 
 
     }
-    public partial class ShortcutWindow : Window
+    public partial class ShortcutWindow : MetroWindow
     {
         public ShortcutWindow(List<List<string>> shortcutFiles)
         {
@@ -161,7 +161,7 @@ namespace IconDisplayApp
 
                             // 如果当前父级是 AppWrapPanel，则不执行后续操作
                             if (currentParent == AppWrapPanel)
-                            {
+                            {   //TODO:再添加完之后的双击打开事件？好像没必要
                                 //TODO:之后给图标添加其他点击事件
                                 return;
                             }

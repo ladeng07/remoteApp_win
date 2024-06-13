@@ -80,6 +80,35 @@ namespace remoteApp_win
             Close();
         }
 
-  
+        private void WrapPanel_DragEnter(object sender, DragEventArgs e)
+        {
+            //拖拽事件
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+
+        private void WrapPanel_Drop(object sender, DragEventArgs e)
+        {
+            //拖拽事件
+
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string file in files)
+                {
+                    // 这里处理拖入的文件
+                    MessageBox.Show("文件拖入: " + file);
+                }
+            }
+        }
+
+
     }
 }

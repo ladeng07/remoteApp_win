@@ -1,6 +1,7 @@
 ﻿using AduSkin.Controls.Metro;
 using Microsoft.Win32;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,6 +32,9 @@ namespace remoteApp_win.UserControls
             remoteDesktopSwitch.Content = enable ? "启用" : "关闭";
             remoteDesktopSwitch.IsChecked = enable;
 
+            enable = IsUACEnabled();
+            UACSwitch.Content = enable ? "启用" : "关闭";
+            UACSwitch.IsChecked = enable;
         }
 
 
@@ -77,6 +81,10 @@ namespace remoteApp_win.UserControls
             remoteDesktopSwitch.Content = enabled ? "启用" : "关闭";
         }
 
+
+
+
+        //会话时长
         private void remoteDesktopTimeChanged(object sender, RoutedEventArgs e)
         {
             //TODO
@@ -113,6 +121,64 @@ namespace remoteApp_win.UserControls
             
             return value;
         }
+
+
+
+
+        //UAC
+        private void UAC_Checked(object sender, RoutedEventArgs e)
+        {
+            ModifyUAC(true);
+        }
+
+        private void UAC_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ModifyUAC(false);
+        }
+
+        private void ModifyUAC(bool enable)
+        {
+            try
+            {
+                string keyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(keyPath, true))
+                {
+                    if (key != null)
+                    {
+                        key.SetValue("EnableLUA", enable ? 1 : 0, RegistryValueKind.DWord);
+
+                        UACSwitch.Content = enable ? "启用" : "关闭";
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("无法打开注册表项。");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"修改注册表时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private bool IsUACEnabled()
+        {
+            // UAC的设置保存在注册表中的以下位置
+            string keyPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+
+            // 读取 "EnableLUA" 键的值
+            object value = Registry.GetValue(keyPath, "EnableLUA", null);
+
+            // 将值转换为int类型
+            int enableLUAValue = (int)value;
+
+            // 返回是否UAC已禁用
+            return enableLUAValue == 1;
+        }
+
+
+
+
 
         //查看lxz的server是否存活
         public bool IsProcessRunning(string processName)

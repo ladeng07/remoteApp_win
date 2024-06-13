@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:remoteApp_win"
         Background="#FFF" BorderThickness="0"
         mc:Ignorable="d"
-        DataContext="{Binding Source={StaticResource Locator},Path=Main}"             
+        DataContext="{Binding Source={StaticResource Locator},Path=Main}"   
         Title="云应用分发器Demo" Height="450" Width="800" Icon="/logo.png" >
 
 

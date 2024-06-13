@@ -8,7 +8,7 @@
              xmlns:AduAttach="clr-namespace:AduSkin.Controls.Attach;assembly=AduSkin"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
+
 
     <Grid>
         
@@ -41,9 +41,9 @@
                 <TextBlock Text="我的应用" Margin="5" Foreground="Aqua"/>
 
                 <!-- 第二行放置WrapPanel -->
-                <ScrollViewer Grid.Row="1" Template="{StaticResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto">
-                    
-                    <WrapPanel  x:Name="AppWrapPanel" AllowDrop="True" DragEnter="WrapPanel_DragEnter" Drop="WrapPanel_Drop"
+                <ScrollViewer  Grid.Row="1" Template="{StaticResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto">
+
+                    <WrapPanel  x:Name="AppWrapPanel" 
                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                     <!-- 在这里添加 WrapPanel 中的内容 -->
                 </WrapPanel>
