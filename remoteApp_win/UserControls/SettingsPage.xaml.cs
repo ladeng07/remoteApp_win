@@ -87,7 +87,7 @@ namespace remoteApp_win.UserControls
         //会话时长
         private void remoteDesktopTimeChanged(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO 修改最长RDP断连时间
 
         }
 
@@ -112,10 +112,10 @@ namespace remoteApp_win.UserControls
             int value = 0;
 
          
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services");
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services");
             if (key != null)
             {
-                value = (int)key.GetValue("RemoteAppLogoffTimeLimit", 0);
+                value = (int)key.GetValue("MaxDisconnectionTime", 0);
                 key.Close();
             }
             
