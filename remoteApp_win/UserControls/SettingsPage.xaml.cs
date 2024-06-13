@@ -177,6 +177,27 @@ namespace remoteApp_win.UserControls
         }
 
 
+        //重启
+        private void RestartButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = AduMessageBox.Show("确定要重启吗？", "确认重启", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                // 执行重启操作
+                Process.Start("shutdown", "/r /t 0");
+            }
+        }
+
+        //关机
+        private void ShutdownButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = AduMessageBox.Show("确定要关机吗？", "确认关机", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                // 执行关机操作
+                Process.Start("shutdown", "/s /t 0");
+            }
+        }
 
 
 
