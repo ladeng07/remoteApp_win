@@ -113,7 +113,31 @@ namespace remoteApp_win.UserControls
                 if (clickedStackPanel != null)
                 {
                     string appPath = System.IO.Path.GetDirectoryName(clickedStackPanel.AppPath);
-                    FindUninstallPath(appPath);
+                    string uninstallPath = FindUninstallPath(appPath);
+
+
+                    if (uninstallPath != null)
+                    {
+                        try
+                        {   //有一些软件卸载不生效（edge）
+                            // Start the uninstall process using cmd.exe
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = "cmd.exe",
+                                Arguments = $"/c {uninstallPath}",
+                                UseShellExecute = false,
+                                CreateNoWindow = true
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"打开卸载程序失败: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("卸载程序未找到");
+                    }
                 }
             }
 
