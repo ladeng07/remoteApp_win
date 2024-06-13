@@ -35,6 +35,8 @@ namespace remoteApp_win.UserControls
             enable = IsUACEnabled();
             UACSwitch.Content = enable ? "启用" : "关闭";
             UACSwitch.IsChecked = enable;
+
+            remoteDesktopTimeLoaded();
         }
 
 
@@ -91,19 +93,17 @@ namespace remoteApp_win.UserControls
 
         }
 
-        private void remoteDesktopTimeLoaded(object sender, RoutedEventArgs e)
+        private void remoteDesktopTimeLoaded()
         {
-            // 获取ComboBox
-            AduComboBox comboBox = (AduComboBox)sender;
 
             // 读取注册表中的值
             int registryValue = ReadRegistryValue();
 
             // 将注册表的值添加到ComboBox的第一个位置
-            comboBox.Items.Insert(0, registryValue);
+            remoteDesktopTime.Items.Insert(0, registryValue);
 
             // 设置默认选中项为第一个项
-            comboBox.SelectedIndex = 0;
+            remoteDesktopTime.SelectedIndex = 0;
         }
 
         // 从注册表中读取DWORD值的方法

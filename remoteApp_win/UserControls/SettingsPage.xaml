@@ -21,7 +21,7 @@
             <AduSkin:AduFormLable Title="会话保持时间" Margin="0,10,0,0">
               
             
-            <AduSkin:AduComboBox x:Name="remoteDesktopTime" Loaded="remoteDesktopTimeLoaded" SelectionChanged="remoteDesktopTimeChanged" Height="30" Width="200" IsEditable="True"  Background="Transparent" Margin="10,10,0,10" HorizontalAlignment="Right">
+            <AduSkin:AduComboBox x:Name="remoteDesktopTime"  SelectionChanged="remoteDesktopTimeChanged" Height="30" Width="200" IsEditable="True"  Background="Transparent" Margin="10,10,0,10" HorizontalAlignment="Right">
                 <ComboBoxItem>3000</ComboBoxItem>
                 <ComboBoxItem>50000</ComboBoxItem>
                 <ComboBoxItem>50000</ComboBoxItem>

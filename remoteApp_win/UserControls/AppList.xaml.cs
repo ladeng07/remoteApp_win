@@ -119,7 +119,7 @@ namespace remoteApp_win.UserControls
                     if (uninstallPath != null)
                     {
                         try
-                        {   //有一些软件卸载不生效（edge）
+                        {   // TODO：有一些软件卸载不生效（edge）
                             // Start the uninstall process using cmd.exe
                             Process.Start(new ProcessStartInfo
                             {
