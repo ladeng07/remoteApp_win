@@ -384,83 +384,93 @@ namespace remoteApp_win.UserControls
 
                 // 检查文件扩展名是否为 .exe 或 .lnk
                 string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
-                if (extension.Equals(".exe") || extension.Equals(".lnk"))
+                if (extension.Equals(".exe") || extension.Equals(".lnk") )
                 {
                     if (extension.Equals(".lnk")) {
+                        //如果是.lnk则寻找到对应的exe
                         WshShell shell_ = new WshShell();
                         IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
                         filePath = shortcut_.TargetPath;
 
-                    }
-                    // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
-                    bool exists = false;
-                    foreach (UIElement element in AppWrapPanel.Children)
-                    {
-                        AppStackPanel_ existingPanel = element as AppStackPanel_;
-                        if (existingPanel != null && existingPanel.AppPath == filePath)
+                        //判断快捷方式是exe还是目录
+                        if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
                         {
-                            exists = true;
-                            break;
+                            // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
+                            bool exists = false;
+                            foreach (UIElement element in AppWrapPanel.Children)
+                            {
+                                AppStackPanel_ existingPanel = element as AppStackPanel_;
+                                if (existingPanel != null && existingPanel.AppPath == filePath)
+                                {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists) AduMessageBox.Show($"该应用已存在");
+                            else
+                            {
+
+                                Image shortcutImage = new Image();
+
+                                string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+
+                                // Extract icon from EXE file
+                                Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
+                                //TODO:打开Docker，坚果云会找不到
+                                BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                                    icon.Handle,
+                                    Int32Rect.Empty,
+                                    BitmapSizeOptions.FromWidthAndHeight(32, 32));
+
+                                shortcutImage.Source = bitmapSource;
+
+                                shortcutImage.Width = 32;
+                                shortcutImage.Height = 32;
+                                shortcutImage.Margin = new Thickness(10);
+
+                                TextBlock shortcutText = new TextBlock();
+                                shortcutText.Text = shortcutName;
+                                shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+                                shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+                                shortcutText.Width = 60;
+                                shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+                                shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+                                shortcutText.Margin = new Thickness(10);
+
+                                AppStackPanel_ stackPanel = new AppStackPanel_();
+                                stackPanel.Orientation = Orientation.Vertical;
+                                stackPanel.Children.Add(shortcutImage);
+                                stackPanel.Children.Add(shortcutText);
+                                stackPanel.AppPath = filePath;
+                                stackPanel.AppName = shortcutName;
+                                stackPanel.AppIconPath = filePath;//TODO
+
+
+                                //给远程应用添加右下角角标
+                                BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+                                BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+
+                                stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+
+                                // 添加点击事件
+                                stackPanel.DoubleClick += (sender_, e_) =>
+                                {
+                                    AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
+                                    Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
+                                };
+
+
+                                AppWrapPanel.Children.Add(stackPanel);
+
+                                //刷新文件
+                                WriteAppWrapPanelContentsToFile();
+                            }
+
                         }
-                    }
-                    if (exists) AduMessageBox.Show($"该应用已存在");
-                    else
-                    {
-
-                        Image shortcutImage = new Image();
-
-                        string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
-
-                        // Extract icon from EXE file
-                        Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
-                        //TODO:打开Docker，坚果云会找不到
-                        BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                            icon.Handle,
-                            Int32Rect.Empty,
-                            BitmapSizeOptions.FromWidthAndHeight(32, 32));
-                        
-                        shortcutImage.Source = bitmapSource;
-
-                        shortcutImage.Width = 32;
-                        shortcutImage.Height = 32;
-                        shortcutImage.Margin = new Thickness(10);
-
-                        TextBlock shortcutText = new TextBlock();
-                        shortcutText.Text = shortcutName;
-                        shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
-                        shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
-                        shortcutText.Width = 60;
-                        shortcutText.MaxHeight = 4 * shortcutText.FontSize;
-                        shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
-                        shortcutText.Margin = new Thickness(10);
-
-                        AppStackPanel_ stackPanel = new AppStackPanel_();
-                        stackPanel.Orientation = Orientation.Vertical;
-                        stackPanel.Children.Add(shortcutImage);
-                        stackPanel.Children.Add(shortcutText);
-                        stackPanel.AppPath = filePath;
-                        stackPanel.AppName = shortcutName;
-                        stackPanel.AppIconPath = filePath;//TODO
-
-
-                        //给远程应用添加右下角角标
-                        BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
-                        BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
-
-                        stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
-
-                        // 添加点击事件
-                        stackPanel.DoubleClick += (sender_, e_) =>
+                        else 
                         {
-                            AppStackPanel_ clickedStackPanel = sender as AppStackPanel_;
-                            Process.Start(new ProcessStartInfo(clickedStackPanel.AppPath) { UseShellExecute = true });
-                        };
-
-
-                        AppWrapPanel.Children.Add(stackPanel);
-
-                        //刷新文件
-                        WriteAppWrapPanelContentsToFile();
+                            AduMessageBox.Show($"请选择可执行文件的快捷方式！");
+                        }
                     }
                 }
                 else
