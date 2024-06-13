@@ -166,6 +166,7 @@ namespace IconDisplayApp
                                 return;
                             }
 
+                            //删除指定桌面的的APP
                             wrapPanels[temp].Children.Remove(clickedStackPanel);
 
                             AppStackPanel_ childdStackPanel = new AppStackPanel_();
@@ -173,6 +174,12 @@ namespace IconDisplayApp
                             childdStackPanel.AppName = clickedStackPanel.AppName;
                             childdStackPanel.AppIconPath = clickedStackPanel.AppIconPath;
                             childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
+                            for (int i = 0; i < 2; i++) {
+                                FrameworkElement originalChild = clickedStackPanel.Children[0] as FrameworkElement;
+                                clickedStackPanel.Children.Remove(originalChild);
+                                childdStackPanel.Children.Add(originalChild);
+
+                            }
 
                             // 获取 clickedStackPanel 的父元素
                             Panel parentPanel = clickedStackPanel.Parent as Panel;
@@ -181,11 +188,10 @@ namespace IconDisplayApp
                                 // 从父元素中移除 clickedStackPanel
                                 parentPanel.Children.Remove(clickedStackPanel);
                             }
-                            //将AppStackPanel子元素添加到AppStackPanel_中
-                            //childdStackPanel.Children.Add(clickedStackPanel);
 
-                            AppWrapPanel.Children.Add(clickedStackPanel);
+                            AppWrapPanel.Children.Add(childdStackPanel);
 
+                            //刷新list.json
                             WriteAppWrapPanelContentsToFile();
                         }
                     };
