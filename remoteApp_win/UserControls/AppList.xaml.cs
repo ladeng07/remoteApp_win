@@ -131,12 +131,12 @@ namespace remoteApp_win.UserControls
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"打开卸载程序失败: {ex.Message}");
+                            AduMessageBox.Show($"打开卸载程序失败: {ex.Message}");
                         }
                     }
                     else
                     {
-                        MessageBox.Show("卸载程序未找到");
+                        AduMessageBox.Show("卸载程序未找到");
                     }
                 }
             }
@@ -227,7 +227,7 @@ namespace remoteApp_win.UserControls
                                     object uninstallString = subKey.GetValue("UninstallString");
                                     if (uninstallString != null)
                                     {
-                                        MessageBox.Show(uninstallString.ToString());
+                                        AduMessageBox.Show(uninstallString.ToString());
                                         return uninstallString.ToString();
                                     }
                                 }
@@ -366,7 +366,7 @@ namespace remoteApp_win.UserControls
                 foreach (string file in files)
                 {
                     // 这里处理拖入的文件
-                    MessageBox.Show("文件拖入: " + file);
+                    AduMessageBox.Show("文件拖入: " + file);
                 }
             }
         }
@@ -403,7 +403,7 @@ namespace remoteApp_win.UserControls
                             break;
                         }
                     }
-                    if (exists) MessageBox.Show($"该应用已存在");
+                    if (exists) AduMessageBox.Show($"该应用已存在");
                     else
                     {
 
@@ -418,7 +418,7 @@ namespace remoteApp_win.UserControls
                             icon.Handle,
                             Int32Rect.Empty,
                             BitmapSizeOptions.FromWidthAndHeight(32, 32));
-
+                        
                         shortcutImage.Source = bitmapSource;
 
                         shortcutImage.Width = 32;
@@ -441,7 +441,13 @@ namespace remoteApp_win.UserControls
                         stackPanel.AppPath = filePath;
                         stackPanel.AppName = shortcutName;
                         stackPanel.AppIconPath = filePath;//TODO
-                        stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+
+
+                        //给远程应用添加右下角角标
+                        BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+                        BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+
+                        stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
 
                         // 添加点击事件
                         stackPanel.DoubleClick += (sender_, e_) =>
@@ -459,7 +465,7 @@ namespace remoteApp_win.UserControls
                 }
                 else
                 {
-                    MessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
+                    AduMessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
                 }
             }
         }
@@ -551,6 +557,27 @@ namespace remoteApp_win.UserControls
             System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
         }
 
-        
+        public static BitmapSource AddIconToBitmap(BitmapSource bitmapSource, BitmapSource iconSource, int iconSize)
+        {
+            int width = bitmapSource.PixelWidth;
+            int height = bitmapSource.PixelHeight;
+
+            DrawingVisual visual = new DrawingVisual();
+            using (DrawingContext context = visual.RenderOpen())
+            {
+                // Draw the original bitmap
+                context.DrawImage(bitmapSource, new Rect(0, 0, width, height));
+
+                // Draw the icon in the right bottom corner
+                context.DrawImage(iconSource, new Rect(width - iconSize, height - iconSize, iconSize, iconSize));
+            }
+
+            RenderTargetBitmap result = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+            result.Render(visual);
+
+            return result;
+        }
+
+
     }
 }

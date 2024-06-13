@@ -157,7 +157,7 @@ namespace remoteApp_win.UserControls
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"修改注册表时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                AduMessageBox.Show($"修改注册表时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
