@@ -54,7 +54,7 @@ namespace remoteApp_win.UserControls
 
                 //设置
                 MetroMenuItem menuSetting = new MetroMenuItem();
-                menuSetting.Header = "设置";
+                menuSetting.Header = "卸载";
                 menuSetting.Foreground = Brushes.Black;
                 menuSetting.Click += MenuItem_Setting_Click;
                 rightClickMenu.Items.Add(menuSetting);
@@ -108,7 +108,13 @@ namespace remoteApp_win.UserControls
 
             private void MenuItem_Setting_Click(object sender, RoutedEventArgs e)
             {
-                //TODO
+                AppStackPanel_ clickedStackPanel = this as AppStackPanel_;
+                WrapPanel parentPanel = clickedStackPanel.Parent as WrapPanel;
+                if (clickedStackPanel != null)
+                {
+                    string appPath = System.IO.Path.GetDirectoryName(clickedStackPanel.AppPath);
+                    FindUninstallPath(appPath);
+                }
             }
 
             private void MenuItem_Del_Click(object sender, RoutedEventArgs e)
@@ -155,6 +161,57 @@ namespace remoteApp_win.UserControls
                     System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
                     //到这
                 }
+            }
+
+            //编译注册表寻找卸载程序
+            private static string FindUninstallPath(string location)
+            {
+                string uninstallPath = null;
+                string[] uninstallKeys = new string[]
+                {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                };
+
+                // Access the 64-bit registry view
+                uninstallPath = FindUninstallPathInRegistry(location, uninstallKeys[0], RegistryView.Registry64);
+                if (uninstallPath != null)
+                    return uninstallPath;
+
+                // Access the 32-bit registry view
+                uninstallPath = FindUninstallPathInRegistry(location, uninstallKeys[1], RegistryView.Registry32);
+                return uninstallPath;
+            }
+
+            private static string FindUninstallPathInRegistry(string location, string uninstallKey, RegistryView registryView)
+            {
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
+                using (RegistryKey key = baseKey.OpenSubKey(uninstallKey))
+                {
+                    if (key != null)
+                    {
+                        foreach (string subKeyName in key.GetSubKeyNames())
+                        {
+                            using (RegistryKey subKey = key.OpenSubKey(subKeyName))
+                            {
+                                if (subKey == null) continue;
+
+                                object installLocation = subKey.GetValue("InstallLocation");
+                                //location = location.TrimEnd('\\');
+                                if (installLocation != null && !string.IsNullOrEmpty(installLocation.ToString().TrimEnd('\\')) && location.Contains(installLocation.ToString().TrimEnd('\\')))
+                                {
+                                    object uninstallString = subKey.GetValue("UninstallString");
+                                    if (uninstallString != null)
+                                    {
+                                        MessageBox.Show(uninstallString.ToString());
+                                        return uninstallString.ToString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return null;
             }
         }
 
@@ -332,7 +389,7 @@ namespace remoteApp_win.UserControls
 
                         // Extract icon from EXE file
                         Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
-                        //TODO:打开Docker会找不到
+                        //TODO:打开Docker，坚果云会找不到
                         BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                             icon.Handle,
                             Int32Rect.Empty,
@@ -469,5 +526,7 @@ namespace remoteApp_win.UserControls
             string fileName = "list.json";
             System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
         }
+
+        
     }
 }
