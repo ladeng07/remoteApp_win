@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Web.UI.WebControls;
 
 namespace remoteApp_win.UserControls
 {
@@ -30,10 +31,12 @@ namespace remoteApp_win.UserControls
             InitializeComponent();
             bool enable = IsRemoteDesktopEnabled();
             remoteDesktopSwitch.Content = enable ? "启用" : "关闭";
+            remoteDesktopSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
             remoteDesktopSwitch.IsChecked = enable;
 
             enable = IsUACEnabled();
             UACSwitch.Content = enable ? "启用" : "关闭";
+            UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
             UACSwitch.IsChecked = enable;
 
             remoteDesktopTimeLoaded();
@@ -81,6 +84,7 @@ namespace remoteApp_win.UserControls
             Registry.SetValue(keyPath, "fDenyTSConnections", enabled ? 0 : 1);
 
             remoteDesktopSwitch.Content = enabled ? "启用" : "关闭";
+            remoteDesktopSwitch.Foreground = enabled ? Brushes.Green : Brushes.Red;
         }
 
 
@@ -148,6 +152,7 @@ namespace remoteApp_win.UserControls
                         key.SetValue("EnableLUA", enable ? 1 : 0, RegistryValueKind.DWord);
 
                         UACSwitch.Content = enable ? "启用" : "关闭";
+                        UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
                     }
                     else
                     {

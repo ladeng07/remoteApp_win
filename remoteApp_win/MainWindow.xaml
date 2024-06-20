@@ -8,7 +8,7 @@
         Background="#FFF" BorderThickness="0"
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator},Path=Main}"   
-        Title="云应用分发器Demo" Height="450" Width="800" Icon="/logo.png" >
+        Title="云应用分发器Demo" Height="450" Width="800" Icon="/logo.png" MinWidth="280" MinHeight="360">
 
 
     <AduSkin:MetroWindow.Menu>
