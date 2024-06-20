@@ -276,6 +276,11 @@ namespace IconDisplayApp
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
+                if (imageSource == null)
+                {   // TODO
+                    // 当ImageSource为空时，返回一个空字符串或者其他默认处理
+                    return string.Empty; // 或者返回一个默认图片的Base64编码
+                }
                 BitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource));
                 encoder.Save(memoryStream);

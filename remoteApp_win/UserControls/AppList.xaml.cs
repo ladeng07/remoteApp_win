@@ -498,6 +498,9 @@ namespace remoteApp_win.UserControls
                 foreach (var file in Directory.GetFiles(desktopPath, "*.lnk"))
                 {
                     string targetPath = GetShortcutTarget(file);
+                    //TODO:有些快捷方式的targepath为空，需要处理
+                    if (targetPath == "") continue;
+
                     FileInfo fileInfo = new FileInfo(targetPath);
 
                     // 检查目标路径是否为文件
