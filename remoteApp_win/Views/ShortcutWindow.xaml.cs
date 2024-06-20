@@ -33,9 +33,19 @@ namespace IconDisplayApp
     {
 
         public string AppPath;
-        public string AppName;
+        private string appName;
         public string AppIconPath;
         public string AppIcon;
+
+        public string AppName
+        {
+            get => appName;
+            set
+            {
+                appName = value;
+                UpdateToolTip();
+            }
+        }
 
         // 构造函数
         public AppStackPanel() : base()
@@ -46,9 +56,8 @@ namespace IconDisplayApp
             AppIconPath = "";
             AppIcon = "";
             Background = Brushes.Transparent;
-
-
-        
+            ToolTipService.SetInitialShowDelay(this, 1000); // 鼠标悬停3秒后显示
+            ToolTipService.SetBetweenShowDelay(this, 0);   // 确保每次都重新计算延迟时间
         }
 
         protected override void OnMouseEnter(MouseEventArgs e)
@@ -67,6 +76,15 @@ namespace IconDisplayApp
             Background = Brushes.Transparent;
         }
 
+        private void UpdateToolTip()
+        {
+            ToolTip toolTip = new ToolTip
+            {
+                Content = new TextBlock { Text = AppName }
+            };
+            ToolTipService.SetToolTip(this, toolTip);
+        }
+
 
     }
     public partial class ShortcutWindow : MetroWindow
@@ -75,6 +93,12 @@ namespace IconDisplayApp
         {
             InitializeComponent();
             DisplayShortcuts(shortcutFiles);
+
+            // 将传入的参数保存到窗口的实例中
+            DataContext = shortcutFiles;
+
+            // 在窗口关闭时释放实例
+            Closing += (s, e) => instance = null;
         }
  
 
@@ -288,6 +312,31 @@ namespace IconDisplayApp
                 return Convert.ToBase64String(imageBytes);
             }
         }
+
+        private static ShortcutWindow instance;
+
+        public static ShortcutWindow Instance(List<List<string>> shortcutFilesList)
+        {
+            if (instance == null)
+            {
+                instance = new ShortcutWindow(shortcutFilesList);
+            }
+            return instance;
+        }
+
+        public static void ShowWindow(List<List<string>> shortcutFilesList)
+        {
+            var window = Instance(shortcutFilesList);
+            if (!window.IsVisible)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.Activate(); // 如果窗口已经显示，则激活窗口
+            }
+        }
+
 
 
     }

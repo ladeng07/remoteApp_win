@@ -35,9 +35,9 @@ namespace remoteApp_win.UserControls
             remoteDesktopSwitch.IsChecked = enable;
 
             enable = IsUACEnabled();
-            UACSwitch.Content = enable ? "启用" : "关闭";
-            UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
-            UACSwitch.IsChecked = enable;
+            //UACSwitch.Content = enable ? "启用" : "关闭";
+            //UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
+            //UACSwitch.IsChecked = enable;
 
             remoteDesktopTimeLoaded();
         }
@@ -151,8 +151,8 @@ namespace remoteApp_win.UserControls
                     {
                         key.SetValue("EnableLUA", enable ? 1 : 0, RegistryValueKind.DWord);
 
-                        UACSwitch.Content = enable ? "启用" : "关闭";
-                        UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
+                        //UACSwitch.Content = enable ? "启用" : "关闭";
+                        //UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
                     }
                     else
                     {

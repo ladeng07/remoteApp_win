@@ -18,7 +18,7 @@
             <AduSkin:MetroSwitch  x:Name="remoteDesktopSwitch" Margin="10"  Checked="remoteDesktopSwitch_Checked" Unchecked="remoteDesktopSwitch_Unchecked"  CornerRadius="100" />
             </AduSkin:AduFormLable>
                 <!--<TextBlock x:Name="remoteDesktopTimeText" Text="会话保持时间"/>-->
-            <AduSkin:AduFormLable Title="会话保持时间" Margin="0,10,0,0">
+            <AduSkin:AduFormLable Title="会话注销时间" Margin="0,10,0,0">
               
             
             <AduSkin:AduComboBox x:Name="remoteDesktopTime"  SelectionChanged="remoteDesktopTimeChanged" Height="30" Width="200" IsEditable="True"  Background="Transparent" Margin="10,10,0,10" HorizontalAlignment="Right">
@@ -30,9 +30,9 @@
 
             </AduSkin:AduComboBox>
             </AduSkin:AduFormLable>
-            <AduSkin:AduFormLable Title="UAC状态" Margin="0,10,0,0">
+            <!--<AduSkin:AduFormLable Title="UAC状态" Margin="0,10,0,0">
                 <AduSkin:MetroSwitch  x:Name="UACSwitch" Margin="10"  Checked="UAC_Checked" Unchecked="UAC_Unchecked"  CornerRadius="100" />
-            </AduSkin:AduFormLable>
+            </AduSkin:AduFormLable>-->
 
             <AduSkin:AduFormLable Title="主机功能" Margin="0,10,0,0">
                 <WrapPanel HorizontalAlignment="Right">
