@@ -117,10 +117,21 @@ namespace IconDisplayApp
 
                     string iconLocation = shortcut.IconLocation;
                     string shortcutName = System.IO.Path.GetFileNameWithoutExtension(shortcutFile);
+                    string TargetPath = shortcut.TargetPath;
 
                     Image shortcutImage = new Image();
 
-                    string finalLocation = iconLocation.Length > 2 ? iconLocation : shortcut.TargetPath + ",0";
+                    // 修正路径
+                    if (!System.IO.File.Exists(TargetPath))
+                    {
+                        TargetPath = FixPath(TargetPath);
+
+                    }
+
+                    string finalLocation = iconLocation.Length > 2 ? iconLocation : TargetPath + ",0";
+
+                   
+
                     //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
                     shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
 
@@ -168,7 +179,7 @@ namespace IconDisplayApp
                     stackPanel.Orientation = Orientation.Vertical;
                     stackPanel.Children.Add(shortcutImage);
                     stackPanel.Children.Add(shortcutText);
-                    stackPanel.AppPath = shortcut.TargetPath;
+                    stackPanel.AppPath = TargetPath;
                     stackPanel.AppName = shortcutName;
                     stackPanel.AppIconPath = finalLocation;
                     stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
@@ -338,6 +349,17 @@ namespace IconDisplayApp
         }
 
 
-
+        private string FixPath(string targetPath)
+        {
+            if (targetPath.Contains("Program Files (x86)"))
+            {
+                string newPath = targetPath.Replace("Program Files (x86)", "Program Files");
+                if (System.IO.File.Exists(newPath))
+                {
+                    return newPath;
+                }
+            }
+            return targetPath;
+        }
     }
 }

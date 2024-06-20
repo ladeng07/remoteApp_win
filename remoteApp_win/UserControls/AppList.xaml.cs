@@ -501,6 +501,12 @@ namespace remoteApp_win.UserControls
                     //TODO:有些快捷方式的targepath为空，需要处理
                     if (targetPath == "") continue;
 
+                    // 修正路径
+                    if (!System.IO.File.Exists(targetPath))
+                    {
+                        targetPath = FixPath(targetPath);
+                    }
+
                     FileInfo fileInfo = new FileInfo(targetPath);
 
                     // 检查目标路径是否为文件
@@ -594,5 +600,18 @@ namespace remoteApp_win.UserControls
         }
 
 
+
+        private string FixPath(string targetPath)
+        {
+            if (targetPath.Contains("Program Files (x86)"))
+            {
+                string newPath = targetPath.Replace("Program Files (x86)", "Program Files");
+                if (System.IO.File.Exists(newPath))
+                {
+                    return newPath;
+                }
+            }
+            return targetPath;
+        }
     }
 }
