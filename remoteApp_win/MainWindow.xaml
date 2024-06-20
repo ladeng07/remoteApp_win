@@ -36,7 +36,7 @@
                 </Style>
             </AduSkin:AduTabControl.Resources>
             <!--tab表项-->
-            <AduSkin:AduTabItem Header="实用案例">
+            <AduSkin:AduTabItem Header="应用列表">
                 <Border BorderBrush="{StaticResource DefaultBorderBrush}" BorderThickness="0,1,0,0">
                     <ContentControl  Content="{Binding Page1}"/>
                 </Border>

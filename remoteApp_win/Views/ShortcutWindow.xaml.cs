@@ -343,18 +343,18 @@ namespace IconDisplayApp
             return instance;
         }
 
-        public static void ShowWindow(List<List<string>> shortcutFilesList)
-        {
-            var window = Instance(shortcutFilesList);
-            if (!window.IsVisible)
-            {
-                window.Show();
-            }
-            else
-            {
-                window.Activate(); // 如果窗口已经显示，则激活窗口
-            }
-        }
+        //public static void ShowWindow(List<List<string>> shortcutFilesList)
+        //{
+        //    var window = Instance(shortcutFilesList);
+        //    if (!window.IsVisible)
+        //    {
+        //        window.ShowDialog();
+        //    }
+        //    else
+        //    {
+        //        window.Activate(); // 如果窗口已经显示，则激活窗口
+        //    }
+        //}
 
 
         private string FixPath(string targetPath)

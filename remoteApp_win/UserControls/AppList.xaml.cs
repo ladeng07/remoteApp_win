@@ -604,10 +604,10 @@ namespace remoteApp_win.UserControls
             }
 
 
-            //ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFilesList);
-            //shortcutWindow.Show();
+            ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFilesList);
+            shortcutWindow.ShowDialog();
 
-            ShortcutWindow.ShowWindow(shortcutFilesList);
+            ///ShortcutWindow.ShowWindow(shortcutFilesList);
         }
 
         private string GetShortcutTarget(string shortcutPath)
