@@ -664,6 +664,11 @@ namespace remoteApp_win.UserControls
 
         public static BitmapSource AddIconToBitmap(BitmapSource bitmapSource, BitmapSource iconSource, int iconSize)
         {
+            if (bitmapSource == null || iconSource == null)
+            {   // TODO
+                // 当bitmapSource为空时，返回一个空或者其他默认处理
+                return null;
+            }
             int width = bitmapSource.PixelWidth;
             int height = bitmapSource.PixelHeight;
 

@@ -121,7 +121,7 @@ namespace IconDisplayApp
 
                     Image shortcutImage = new Image();
 
-                    // 修正路径，针对部分应用（坚果云和docker）
+                    // 修正路径，针对部分32位应用（坚果云和docker）
                     if (!System.IO.File.Exists(TargetPath))
                     {
                         TargetPath = FixPath(TargetPath);
@@ -164,7 +164,8 @@ namespace IconDisplayApp
                     foreach (UIElement element in AppWrapPanel.Children)
                     {
                         AppStackPanel_ existingPanel = element as AppStackPanel_;
-                        if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == shortcut.TargetPath)
+
+                        if (existingPanel != null && existingPanel.AppName == shortcutName && existingPanel.AppPath == TargetPath)
                         {
                             exists = true;
                             break;
