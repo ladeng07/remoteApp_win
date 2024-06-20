@@ -130,10 +130,12 @@ namespace IconDisplayApp
 
                     string finalLocation = iconLocation.Length > 2 ? iconLocation : TargetPath + ",0";
 
-                   
+
 
                     //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
-                    shortcutImage.Source = GetBitmapSourceFromIcon(finalLocation);
+
+                    BitmapSource bitmapSource = GetBitmapSourceFromIcon(finalLocation);
+                    shortcutImage.Source = bitmapSource;
 
                     shortcutImage.Width = 32;
                     shortcutImage.Height = 32;
@@ -182,7 +184,12 @@ namespace IconDisplayApp
                     stackPanel.AppPath = TargetPath;
                     stackPanel.AppName = shortcutName;
                     stackPanel.AppIconPath = finalLocation;
-                    stackPanel.AppIcon = ImageSourceToBase64(shortcutImage.Source);
+
+                    //给远程应用添加右下角角标
+                    BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+                    BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+
+                    stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
 
                     //获取当前桌面下标
                     int temp = currentPanelIndex;
