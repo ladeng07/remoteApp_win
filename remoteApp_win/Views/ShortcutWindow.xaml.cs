@@ -121,7 +121,7 @@ namespace IconDisplayApp
 
                     Image shortcutImage = new Image();
 
-                    // 修正路径
+                    // 修正路径，针对部分应用（坚果云和docker）
                     if (!System.IO.File.Exists(TargetPath))
                     {
                         TargetPath = FixPath(TargetPath);

@@ -121,13 +121,61 @@ namespace remoteApp_win.UserControls
                         try
                         {   // TODO：有一些软件卸载不生效（edge）
                             // Start the uninstall process using cmd.exe
-                            Process.Start(new ProcessStartInfo
+
+                            if (!uninstallPath.Contains(" --"))
                             {
-                                FileName = "cmd.exe",
-                                Arguments = $"/c {uninstallPath}",
-                                UseShellExecute = false,
-                                CreateNoWindow = true
-                            });
+                                uninstallPath = EnsureQuotedPath(uninstallPath);
+
+
+                                Process.Start(new ProcessStartInfo
+                                {
+                                    FileName = "cmd.exe",
+                                    Arguments = $"/c {uninstallPath}",
+                                    UseShellExecute = false,
+                                    CreateNoWindow = true
+                                });
+                            }
+
+                            else {
+                                // TODO：仍有一小部分应用删除不了（如edge）
+                                // 使用正则表达式分离路径和参数
+                                string exePath = uninstallPath;
+                                string arguments = string.Empty;
+
+                                // 正则表达式匹配引号包围的路径或不包含空格的路径
+                                var match = System.Text.RegularExpressions.Regex.Match(uninstallPath, @"^""([^""]+)""|^([^\s]+)");
+                                if (match.Success)
+                                {
+                                    exePath = match.Groups[1].Value; // 引号包围的路径
+                                    if (string.IsNullOrEmpty(exePath))
+                                    {
+                                        exePath = match.Groups[2].Value; // 不包含空格的路径
+                                    }
+                                    arguments = uninstallPath.Substring(match.Length).TrimStart();
+                                }
+
+                                // 确保路径带有双引号
+                                if (!exePath.StartsWith("\"") && exePath.Contains(" "))
+                                {
+                                    exePath = "\"" + exePath + "\"";
+                                }
+
+                                // 检查是否需要以管理员权限运行
+                                ProcessStartInfo startInfo = new ProcessStartInfo
+                                {
+                                    FileName = exePath,
+                                    Arguments = arguments,
+                                    UseShellExecute = true,
+                                    //Verb = "runas" // 以管理员权限运行
+                                };
+
+                                // 启动卸载程序
+                                Process.Start(startInfo);
+                            }
+
+
+
+
                         }
                         catch (Exception ex)
                         {
@@ -195,21 +243,33 @@ namespace remoteApp_win.UserControls
                 {
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
                 @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+
                 };
 
-                // Access the 64-bit registry view
-                uninstallPath = FindUninstallPathInRegistry(location, uninstallKeys[0], RegistryView.Registry64);
+                // Access the 64-bit registry LOCAL_MACHINE view
+                uninstallPath = FindUninstallPathInRegistry(RegistryHive.LocalMachine,location, uninstallKeys[0], RegistryView.Registry64);
                 if (uninstallPath != null)
                     return uninstallPath;
 
-                // Access the 32-bit registry view
-                uninstallPath = FindUninstallPathInRegistry(location, uninstallKeys[1], RegistryView.Registry32);
+                // Access the 64-bit registry  USER view
+                uninstallPath = FindUninstallPathInRegistry(RegistryHive.CurrentUser, location, uninstallKeys[0], RegistryView.Registry64);
+                if (uninstallPath != null)
+                    return uninstallPath;
+
+                // Access the 32-bit registry  USER view
+                uninstallPath = FindUninstallPathInRegistry(RegistryHive.CurrentUser, location, uninstallKeys[1], RegistryView.Registry64);
+                if (uninstallPath != null)
+                    return uninstallPath;
+
+                // Access the 32-bit registry LOCAL_MACHINE view
+                uninstallPath = FindUninstallPathInRegistry(RegistryHive.LocalMachine,location, uninstallKeys[1], RegistryView.Registry32);
                 return uninstallPath;
+
             }
 
-            private static string FindUninstallPathInRegistry(string location, string uninstallKey, RegistryView registryView)
+            private static string FindUninstallPathInRegistry(RegistryHive hive, string location, string uninstallKey, RegistryView registryView)
             {
-                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(hive, registryView))
                 using (RegistryKey key = baseKey.OpenSubKey(uninstallKey))
                 {
                     if (key != null)
@@ -221,10 +281,23 @@ namespace remoteApp_win.UserControls
                                 if (subKey == null) continue;
 
                                 object installLocation = subKey.GetValue("InstallLocation");
-                                //location = location.TrimEnd('\\');
-                                if (installLocation != null && !string.IsNullOrEmpty(installLocation.ToString().TrimEnd('\\')) && location.Contains(installLocation.ToString().TrimEnd('\\')))
+                                object uninstallString = subKey.GetValue("UninstallString");
+                                //string uninstallString_split = System.IO.Path.GetDirectoryName(uninstallString.ToString());
+
+                                if (//从installlocation找
+                                    (installLocation != null
+                                    && !string.IsNullOrEmpty(installLocation.ToString().TrimEnd('\\')) 
+                                    && location.Contains(installLocation.ToString().TrimEnd('\\'))
+                                    )
+                                        ||
+                                    (//从uninstalllocation找
+                                    uninstallString != null
+                                    && uninstallString.ToString().TrimEnd('\\').Contains(location)
+                                        
+                                    )    
+                                )
                                 {
-                                    object uninstallString = subKey.GetValue("UninstallString");
+                                    
                                     if (uninstallString != null)
                                     {
                                         AduMessageBox.Show(uninstallString.ToString());
@@ -236,6 +309,17 @@ namespace remoteApp_win.UserControls
                     }
                 }
                 return null;
+            }
+
+            private string EnsureQuotedPath(string path)
+            {
+                // 检查路径是否已经包含双引号
+                if (!path.StartsWith("\"") && !path.EndsWith("\""))
+                {
+                    // 添加双引号
+                    path = "\"" + path + "\"";
+                }
+                return path;
             }
         }
 
@@ -416,7 +500,7 @@ namespace remoteApp_win.UserControls
 
                                 // Extract icon from EXE file
                                 Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
-                                //TODO:打开Docker，坚果云会找不到
+
                                 BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                                     icon.Handle,
                                     Int32Rect.Empty,
@@ -613,5 +697,7 @@ namespace remoteApp_win.UserControls
             }
             return targetPath;
         }
+
+       
     }
 }
