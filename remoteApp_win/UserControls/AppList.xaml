@@ -22,7 +22,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Height="310" VerticalAlignment="Bottom">
-            <AduSkin:AduFlatButton Content="新建远程应用" Click="ScanAndDisplayShortcuts" Width="100" Height="50" Margin="8,15,5,10"/>
+            <AduSkin:AduFlatButton Content="新建远程应用" Click="NewRemoteApp" Width="100" Height="50" Margin="8,15,5,10"/>
             <AduSkin:AduFlatButton Content="扫描桌面" Click="ScanAndDisplayShortcuts" Width="100" Height="50" Margin="8,15,5,10"/>
             <AduSkin:AduFlatButton Name="OpenDesktopButton" Content="打开桌面" Click="OpenDesktopButton_Click" Width="100" Height="50" Margin="8,15,5,10"/>
             <AduSkin:AduFlatButton Name="OpenFileButton" Content="选择安装位置" Click="OpenWeChatButton_Click" Width="100" Height="50" Margin="8,15,5,10"/>

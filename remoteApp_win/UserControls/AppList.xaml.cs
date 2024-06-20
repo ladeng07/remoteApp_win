@@ -1,5 +1,6 @@
 ﻿using AduSkin.Controls.Metro;
 using IconDisplayApp;
+using AddRemoteAppSP;
 using IWshRuntimeLibrary;
 using Newtonsoft.Json;
 using remoteApp_win.ViewModel;
@@ -607,7 +608,13 @@ namespace remoteApp_win.UserControls
             ShortcutWindow shortcutWindow = new ShortcutWindow(shortcutFilesList);
             shortcutWindow.ShowDialog();
 
-            ///ShortcutWindow.ShowWindow(shortcutFilesList);
+        }
+
+        private void NewRemoteApp(object sender, RoutedEventArgs e) {
+
+            AddRemoteApp RemoteAppWindow = new AddRemoteApp();
+            RemoteAppWindow.ShowDialog();
+
         }
 
         private string GetShortcutTarget(string shortcutPath)

@@ -1,0 +1,61 @@
+﻿<Window x:Class="AddRemoteAppSP.AddRemoteApp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AddRemoteAppSP"
+        mc:Ignorable="d"
+        Title="AddRemoteApp" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Name Input -->
+        <Label Grid.Row="0" Grid.Column="0" Content="名称" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Width="250" Margin="5"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5"/>
+
+        <!-- Application Path Input -->
+        <Label Grid.Row="2" Grid.Column="0" Content="应用路径" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Width="250" Margin="5"/>
+        <Button Grid.Row="2" Grid.Column="2" Content="浏览" Margin="5" Click="BrowseAppPath_Click"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="3" Grid.ColumnSpan="2" Margin="0,5"/>
+
+        <!-- Icon Path Input -->
+        <Label Grid.Row="4" Grid.Column="0" Content="图标路径" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="4" Grid.Column="1" Width="250" Margin="5"/>
+        <Button Grid.Row="4" Grid.Column="2" Content="浏览" Margin="5" Click="BrowseIconPath_Click"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="5" Grid.ColumnSpan="2" Margin="0,5"/>
+
+        <!-- Icon Index Input -->
+        <Label Grid.Row="6" Grid.Column="0" Content="图标索引" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="6" Grid.Column="1" Width="250" Margin="5"/>
+
+        <!-- Separator -->
+        <Separator Grid.Row="7" Grid.ColumnSpan="2" Margin="0,5"/>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="8" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="保存" Width="80" Margin="5" Click="Save_Click"/>
+            <Button Content="取消" Width="80" Margin="5" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

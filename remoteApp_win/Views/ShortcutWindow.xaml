@@ -4,19 +4,6 @@
         xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
         Title="桌面图标" Height="400" Width="600" Icon="/logo.png" ResizeMode="NoResize">
 
-    
-    <!--<TabControl>
-        <TabItem Header="公共桌面">
-        <ScrollViewer>
-        <WrapPanel x:Name="ShortcutWrapPanel"/>
-    </ScrollViewer>
-        </TabItem>
-        <TabItem Header="用户桌面">
-            <ScrollViewer>
-                <WrapPanel x:Name="ShortcutWrapPanel2"/>
-            </ScrollViewer>
-        </TabItem>
-    </TabControl>-->
 
     <AduSkin:AduTabControl Margin="0,0,0,1">
         <AduSkin:AduTabControl.Resources>
