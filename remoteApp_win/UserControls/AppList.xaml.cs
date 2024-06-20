@@ -612,6 +612,8 @@ namespace remoteApp_win.UserControls
 
         private void NewRemoteApp(object sender, RoutedEventArgs e) {
 
+
+
             AddRemoteApp RemoteAppWindow = new AddRemoteApp();
             RemoteAppWindow.ShowDialog();
 

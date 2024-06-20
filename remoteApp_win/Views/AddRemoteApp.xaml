@@ -3,59 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
         xmlns:local="clr-namespace:AddRemoteAppSP"
         mc:Ignorable="d"
-        Title="AddRemoteApp" Height="450" Width="800">
+        Title="AddRemoteApp" Height="450" Width="400">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="350"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+        <StackPanel>
+            <AduSkin:AduFormLable Title="应用名称" Margin="0,10,0,0">
+                <AduSkin:MetroTextBox  x:Name="remoteAppName" Margin="10,0,0,0"  />
+            </AduSkin:AduFormLable>
+            <AduSkin:AduFormLable Title="应用路径" Margin="0,10,0,0">
+                <AduSkin:MetroTextBox x:Name="remoteAppPath"  ButtonTitle="选择" ButtonClick="OpenAppPath_Click" Margin="10,0,0,0"/>
 
-        <!-- Name Input -->
-        <Label Grid.Row="0" Grid.Column="0" Content="名称" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Width="250" Margin="5"/>
+            </AduSkin:AduFormLable>
+            <AduSkin:AduFormLable Title="图标路径" Margin="0,10,0,0">
+                <AduSkin:MetroTextBox x:Name="remoteAppIconPath" ButtonTitle="选择"  Margin="10,0,0,0"/>
+            </AduSkin:AduFormLable>
+            <AduSkin:AduFormLable Title="图标索引" Margin="0,10,0,0">
+                <AduSkin:MetroTextBox x:Name="remoteAppIconIndex" ButtonTitle="重置"  Margin="10,0,0,0"/>
+            </AduSkin:AduFormLable>
 
-        <!-- Separator -->
-        <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5"/>
-
-        <!-- Application Path Input -->
-        <Label Grid.Row="2" Grid.Column="0" Content="应用路径" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Width="250" Margin="5"/>
-        <Button Grid.Row="2" Grid.Column="2" Content="浏览" Margin="5" Click="BrowseAppPath_Click"/>
-
-        <!-- Separator -->
-        <Separator Grid.Row="3" Grid.ColumnSpan="2" Margin="0,5"/>
-
-        <!-- Icon Path Input -->
-        <Label Grid.Row="4" Grid.Column="0" Content="图标路径" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="4" Grid.Column="1" Width="250" Margin="5"/>
-        <Button Grid.Row="4" Grid.Column="2" Content="浏览" Margin="5" Click="BrowseIconPath_Click"/>
-
-        <!-- Separator -->
-        <Separator Grid.Row="5" Grid.ColumnSpan="2" Margin="0,5"/>
-
-        <!-- Icon Index Input -->
-        <Label Grid.Row="6" Grid.Column="0" Content="图标索引" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="6" Grid.Column="1" Width="250" Margin="5"/>
-
-        <!-- Separator -->
-        <Separator Grid.Row="7" Grid.ColumnSpan="2" Margin="0,5"/>
+        </StackPanel >
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="保存" Width="80" Margin="5" Click="Save_Click"/>
-            <Button Content="取消" Width="80" Margin="5" Click="Cancel_Click"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <AduSkin:AduFlatButton Content="保存" Width="80" Margin="5" Click="Save_Click"/>
+            <AduSkin:AduFlatButton Content="取消" Width="80" Margin="5" Click="Cancel_Click"/>
         </StackPanel>
     </Grid>
 </Window>
