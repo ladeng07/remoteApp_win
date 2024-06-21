@@ -102,6 +102,49 @@ namespace AddRemoteAppSP
                 }
             }
         }
+
+        private void OpenAppIconPath_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "可执行文件 (*.exe;*.lnk)|*.exe;*.lnk|所有文件 (*.*)|*.*";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+
+                // 检查文件扩展名是否为 .exe 或 .lnk
+                string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
+                if (extension.Equals(".exe") || extension.Equals(".lnk"))
+                {
+                    if (extension.Equals(".lnk"))
+                    {
+                        //如果是.lnk则寻找到对应的exe
+                        WshShell shell_ = new WshShell();
+                        IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
+                        filePath = shortcut_.TargetPath;
+
+                        //判断快捷方式是exe还是目录
+                        if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+                        {
+                            //成功逻辑
+                            remoteAppPath.Text = filePath;
+
+                        }
+                        else
+                        {
+                            AduMessageBox.Show($"请选择可执行文件的快捷方式！");
+                        }
+                    }
+                }
+                else
+                {
+                    AduMessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
+                }
+            }
+        }
+
+
+
     }
 
 

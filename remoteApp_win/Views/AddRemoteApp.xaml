@@ -13,18 +13,18 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel>
-            <AduSkin:AduFormLable Title="应用名称" Margin="0,10,0,0">
-                <AduSkin:MetroTextBox  x:Name="remoteAppName" Margin="10,0,0,0"  />
+            <AduSkin:AduFormLable Title="应用名称" Margin="0,10,0,0" >
+                <AduSkin:MetroTextBox  x:Name="remoteAppName" Margin="10,0,-80,0"  />
             </AduSkin:AduFormLable>
             <AduSkin:AduFormLable Title="应用路径" Margin="0,10,0,0">
-                <AduSkin:MetroTextBox x:Name="remoteAppPath"  ButtonTitle="选择" ButtonClick="OpenAppPath_Click" Margin="10,0,0,0"/>
+                <AduSkin:MetroTextBox x:Name="remoteAppPath"  ButtonTitle="选择" ButtonClick="OpenAppPath_Click" Margin="10,0,-80,0"/>
 
             </AduSkin:AduFormLable>
             <AduSkin:AduFormLable Title="图标路径" Margin="0,10,0,0">
-                <AduSkin:MetroTextBox x:Name="remoteAppIconPath" ButtonTitle="选择"  Margin="10,0,0,0"/>
+                <AduSkin:MetroTextBox x:Name="remoteAppIconPath" ButtonTitle="选择" ButtonClick="OpenAppIconPath_Click" Margin="10,0,-80,0"/>
             </AduSkin:AduFormLable>
             <AduSkin:AduFormLable Title="图标索引" Margin="0,10,0,0">
-                <AduSkin:MetroTextBox x:Name="remoteAppIconIndex" ButtonTitle="重置"  Margin="10,0,0,0"/>
+                <AduSkin:MetroTextBox x:Name="remoteAppIconIndex" ButtonTitle="重置"  Margin="10,0,-80,0"/>
             </AduSkin:AduFormLable>
 
         </StackPanel >

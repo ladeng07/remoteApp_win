@@ -17,6 +17,8 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Diagnostics;
 using AduSkin.Controls.Metro;
 using static remoteApp_win.UserControls.AppList;
+//using System.Drawing;
+using Icon = System.Drawing.Icon;
 
 namespace IconDisplayApp
 {
@@ -132,11 +134,35 @@ namespace IconDisplayApp
 
 
 
-                    //shortcutImage.Source = GetBitmapSourceFromIcon(shortcut.TargetPath + ",0");
+                    //选中文件中的图标总数
+                    var iconTotalCount = PrivateExtractIcons(TargetPath, 0, 0, 0, null, null, 0, 0);
 
-                    BitmapSource bitmapSource = GetBitmapSourceFromIcon(finalLocation);
+                    //用于接收获取到的图标指针
+                    IntPtr[] hIcons = new IntPtr[iconTotalCount];
+                    ////对应的图标id
+                    int[] ids = new int[iconTotalCount];
+                    ////成功获取到的图标个数
+                    var successCount = PrivateExtractIcons(TargetPath, 0, 64, 64, hIcons, ids, iconTotalCount, 0);
+
+                    Icon icon;
+                    BitmapSource bitmapSource;
+                    if (hIcons.Length > 0) { //针对exe
+                        icon = System.Drawing.Icon.FromHandle(hIcons[0]);
+                        bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                                      icon.Handle,
+                                      Int32Rect.Empty,
+                                      BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                    }
+                    else {  //针对Icon
+                        bitmapSource = GetBitmapSourceFromIcon(finalLocation);
+                        
+                    }
+
+
+
+
+
                     shortcutImage.Source = bitmapSource;
-
                     shortcutImage.Width = 32;
                     shortcutImage.Height = 32;
 

@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Icon = System.Drawing.Icon;
+//using System.Drawing;
 
 
 namespace remoteApp_win.UserControls
@@ -347,7 +348,34 @@ namespace remoteApp_win.UserControls
                     };
 
                     Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
-                    shortcutImage.Source = GetBitmapSourceFromIcon(appInfo.IconPath);
+
+                    //选中文件中的图标总数
+                    var iconTotalCount = PrivateExtractIcons(filePath, 0, 0, 0, null, null, 0, 0);
+
+                    //用于接收获取到的图标指针
+                    IntPtr[] hIcons = new IntPtr[iconTotalCount];
+                    ////对应的图标id
+                    int[] ids = new int[iconTotalCount];
+                    ////成功获取到的图标个数
+                    var successCount = PrivateExtractIcons(filePath, 0, 64, 64, hIcons, null, iconTotalCount, 0);
+
+                    Icon icon; //判断exe还是ico
+                    BitmapSource bitmapSource;
+                    if (hIcons.Length > 0)
+                    { //添加exe的
+                        icon = System.Drawing.Icon.FromHandle(hIcons[0]);
+                        bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                    }
+                    else
+                    { //添加ico
+                        bitmapSource = GetBitmapSourceFromIcon(appInfo.IconPath);
+                    }
+
+
+                    shortcutImage.Source = bitmapSource;
 
                     shortcutImage.Width = 32;
                     shortcutImage.Height = 32;
@@ -469,6 +497,9 @@ namespace remoteApp_win.UserControls
 
                 // 检查文件扩展名是否为 .exe 或 .lnk
                 string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
+                string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                string iconLocation = "";
+
                 if (extension.Equals(".exe") || extension.Equals(".lnk") )
                 {
                     if (extension.Equals(".lnk")) {
@@ -476,9 +507,10 @@ namespace remoteApp_win.UserControls
                         WshShell shell_ = new WshShell();
                         IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
                         filePath = shortcut_.TargetPath;
-
-                        //判断快捷方式是exe还是目录
-                        if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+                        iconLocation = shortcut_.IconLocation.Length > 2 ? shortcut_.IconLocation : filePath + ",0";
+                    }   
+                    //判断快捷方式是exe还是目录
+                    if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
                         {
                             // 检查 AppWrapPanel 是否已包含具有相同名称和路径的元素
                             bool exists = false;
@@ -497,15 +529,39 @@ namespace remoteApp_win.UserControls
 
                                 Image shortcutImage = new Image();
 
-                                string shortcutName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                                
 
                                 // Extract icon from EXE file
-                                Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
+                                //Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath);
 
-                                BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                                    icon.Handle,
-                                    Int32Rect.Empty,
-                                    BitmapSizeOptions.FromWidthAndHeight(32, 32));
+                                //选中文件中的图标总数
+                                var iconTotalCount = PrivateExtractIcons(filePath, 0, 0, 0, null, null, 0, 0);
+
+                                //用于接收获取到的图标指针
+                                IntPtr[] hIcons = new IntPtr[iconTotalCount];
+                                ////对应的图标id
+                                int[] ids = new int[iconTotalCount];
+                                ////成功获取到的图标个数
+                                var successCount = PrivateExtractIcons(filePath, 0, 64, 64, hIcons, null, iconTotalCount, 0);
+
+
+                                Icon icon; //判断exe还是ico
+                                BitmapSource bitmapSource;
+                                if (hIcons.Length > 0) { //添加exe的
+                                    icon = System.Drawing.Icon.FromHandle(hIcons[0]);
+                                    bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                                        icon.Handle,
+                                        Int32Rect.Empty,
+                                        BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                            }
+                                else { //添加ico
+                                    bitmapSource = GetBitmapSourceFromIcon(iconLocation);
+                            }
+
+
+
+                                
+
 
                                 shortcutImage.Source = bitmapSource;
 
@@ -528,7 +584,7 @@ namespace remoteApp_win.UserControls
                                 stackPanel.Children.Add(shortcutText);
                                 stackPanel.AppPath = filePath;
                                 stackPanel.AppName = shortcutName;
-                                stackPanel.AppIconPath = filePath;//TODO
+                                stackPanel.AppIconPath = iconLocation;//TODO
 
 
                                 //给远程应用添加右下角角标
@@ -556,7 +612,7 @@ namespace remoteApp_win.UserControls
                         {
                             AduMessageBox.Show($"请选择可执行文件的快捷方式！");
                         }
-                    }
+                    
                 }
                 else
                 {
@@ -564,6 +620,29 @@ namespace remoteApp_win.UserControls
                 }
             }
         }
+
+        //details: https://msdn.microsoft.com/en-us/library/windows/desktop/ms648075(v=vs.85).aspx
+        //Creates an array of handles to icons that are extracted from a specified file.
+        //This function extracts from executable (.exe), DLL (.dll), icon (.ico), cursor (.cur), animated cursor (.ani), and bitmap (.bmp) files.
+        //Extractions from Windows 3.x 16-bit executables (.exe or .dll) are also supported.
+        [DllImport("User32.dll")]
+        public static extern int PrivateExtractIcons(
+            string lpszFile, //file name
+            int nIconIndex,  //The zero-based index of the first icon to extract.
+            int cxIcon,      //The horizontal icon size wanted.
+            int cyIcon,      //The vertical icon size wanted.
+            IntPtr[] phicon, //(out) A pointer to the returned array of icon handles.
+            int[] piconid,   //(out) A pointer to a returned resource identifier.
+            int nIcons,      //The number of icons to extract from the file. Only valid when *.exe and *.dll
+            int flags        //Specifies flags that control this function.
+        );
+
+        //details:https://msdn.microsoft.com/en-us/library/windows/desktop/ms648063(v=vs.85).aspx
+        //Destroys an icon and frees any memory the icon occupied.
+        [DllImport("User32.dll")]
+        public static extern bool DestroyIcon1(
+            IntPtr hIcon //A handle to the icon to be destroyed. The icon must not be in use.
+        );
 
         //搜索各个桌面的图标
         private void ScanAndDisplayShortcuts(object sender, RoutedEventArgs e)
