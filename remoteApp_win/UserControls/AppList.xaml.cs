@@ -427,7 +427,7 @@ namespace remoteApp_win.UserControls
 
                 DestroyIcon(hIcon);
                 return bitmapSource;
-            }catch(Exception ex) { return null; }
+            }catch(Exception) { return null; }
             
         }
 

@@ -237,7 +237,7 @@ namespace remoteApp_win.Views
                 DestroyIcon(hIcon);
                 return bitmapSource;
             }
-            catch (Exception ex) { return null; }
+            catch (Exception) { return null; }
 
         }
 

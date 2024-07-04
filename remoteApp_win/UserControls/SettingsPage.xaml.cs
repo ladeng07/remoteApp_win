@@ -34,7 +34,7 @@ namespace remoteApp_win.UserControls
             remoteDesktopSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
             remoteDesktopSwitch.IsChecked = enable;
 
-            enable = IsUACEnabled();
+            //enable = IsUACEnabled();
             //UACSwitch.Content = enable ? "启用" : "关闭";
             //UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
             //UACSwitch.IsChecked = enable;
@@ -129,57 +129,57 @@ namespace remoteApp_win.UserControls
 
 
 
-        //UAC
-        private void UAC_Checked(object sender, RoutedEventArgs e)
+        //设置远程桌面
+        private void AppIcon_Checked(object sender, RoutedEventArgs e)
         {
-            ModifyUAC(true);
+           
         }
 
-        private void UAC_Unchecked(object sender, RoutedEventArgs e)
+        private void AppIcon_Unchecked(object sender, RoutedEventArgs e)
         {
-            ModifyUAC(false);
+            
         }
 
-        private void ModifyUAC(bool enable)
-        {
-            try
-            {
-                string keyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(keyPath, true))
-                {
-                    if (key != null)
-                    {
-                        key.SetValue("EnableLUA", enable ? 1 : 0, RegistryValueKind.DWord);
+        //private void ModifyUAC(bool enable)
+        //{
+        //    try
+        //    {
+        //        string keyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+        //        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(keyPath, true))
+        //        {
+        //            if (key != null)
+        //            {
+        //                key.SetValue("EnableLUA", enable ? 1 : 0, RegistryValueKind.DWord);
 
-                        //UACSwitch.Content = enable ? "启用" : "关闭";
-                        //UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("无法打开注册表项。");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                AduMessageBox.Show($"修改注册表时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+        //                //UACSwitch.Content = enable ? "启用" : "关闭";
+        //                //UACSwitch.Foreground = enable ? Brushes.Green : Brushes.Red;
+        //            }
+        //            else
+        //            {
+        //                throw new InvalidOperationException("无法打开注册表项。");
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        AduMessageBox.Show($"修改注册表时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //}
 
-        private bool IsUACEnabled()
-        {
-            // UAC的设置保存在注册表中的以下位置
-            string keyPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+        //private bool IsUACEnabled()
+        //{
+        //    // UAC的设置保存在注册表中的以下位置
+        //    string keyPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
 
-            // 读取 "EnableLUA" 键的值
-            object value = Registry.GetValue(keyPath, "EnableLUA", null);
+        //    // 读取 "EnableLUA" 键的值
+        //    object value = Registry.GetValue(keyPath, "EnableLUA", null);
 
-            // 将值转换为int类型
-            int enableLUAValue = (int)value;
+        //    // 将值转换为int类型
+        //    int enableLUAValue = (int)value;
 
-            // 返回是否UAC已禁用
-            return enableLUAValue == 1;
-        }
+        //    // 返回是否UAC已禁用
+        //    return enableLUAValue == 1;
+        //}
 
 
         //重启

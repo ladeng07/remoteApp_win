@@ -30,9 +30,9 @@
 
             </AduSkin:AduComboBox>
             </AduSkin:AduFormLable>
-            <!--<AduSkin:AduFormLable Title="UAC状态" Margin="0,10,0,0">
-                <AduSkin:MetroSwitch  x:Name="UACSwitch" Margin="10"  Checked="UAC_Checked" Unchecked="UAC_Unchecked"  CornerRadius="100" />
-            </AduSkin:AduFormLable>-->
+            <AduSkin:AduFormLable Title="远程图标标识" Margin="0,10,0,0">
+                <AduSkin:MetroSwitch  x:Name="AppIconSwitch" Margin="10"  Checked="AppIcon_Checked" Unchecked="AppIcon_Unchecked"  CornerRadius="100" />
+            </AduSkin:AduFormLable>
 
             <AduSkin:AduFormLable Title="主机功能" Margin="0,10,0,0">
                 <WrapPanel HorizontalAlignment="Right">
