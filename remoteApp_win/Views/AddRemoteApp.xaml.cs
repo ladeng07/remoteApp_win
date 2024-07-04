@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 using AduSkin.Controls.Metro;
 using IWshRuntimeLibrary;
 using Microsoft.Win32;
+using remoteApp_win.Views;
+using static remoteApp_win.UserControls.AppList;
 
 
 namespace AddRemoteAppSP
@@ -22,7 +24,7 @@ namespace AddRemoteAppSP
     /// <summary>
     /// AddRemoteApp.xaml 的交互逻辑
     /// </summary>
-    public partial class AddRemoteApp : Window
+    public partial class AddRemoteApp : MetroWindow
     {
         public AddRemoteApp()
         {
@@ -34,10 +36,12 @@ namespace AddRemoteAppSP
         private void BrowseAppPath_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            
+
             if (openFileDialog.ShowDialog() == true)
             {
                 // 你可以设置应用路径文本框的内容
-                // appPathTextBox.Text = openFileDialog.FileName;
+                remoteAppPath.Text = openFileDialog.FileName;
             }
         }
 
@@ -46,13 +50,19 @@ namespace AddRemoteAppSP
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                // 你可以设置图标路径文本框的内容
-                // iconPathTextBox.Text = openFileDialog.FileName;
+                
             }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            AppStackPanel_ childdStackPanel = new AppStackPanel_();
+            childdStackPanel.AppPath = remoteAppPath.Text;
+            childdStackPanel.AppName = remoteAppName.Text;
+            childdStackPanel.AppIconPath = remoteAppIconPath.Text;
+            //childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
+
+
             // 保存按钮的点击事件处理逻辑
             MessageBox.Show("保存成功");
         }
@@ -66,7 +76,7 @@ namespace AddRemoteAppSP
         private void OpenAppPath_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "可执行文件 (*.exe;*.lnk)|*.exe;*.lnk|所有文件 (*.*)|*.*";
+            openFileDialog.Filter = "可执行文件 (*.exe;*.bat;*.cmd)|*.exe;*.bat;*.cmd|所有文件 (*.*)|*.*";
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             if (openFileDialog.ShowDialog() == true)
             {
@@ -74,79 +84,38 @@ namespace AddRemoteAppSP
 
                 // 检查文件扩展名是否为 .exe 或 .lnk
                 string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
-                if (extension.Equals(".exe") || extension.Equals(".lnk"))
+                if (extension.Equals(".exe") || extension.Equals(".bat") || extension.Equals(".cmd"))
                 {
-                    if (extension.Equals(".lnk"))
-                    {
-                        //如果是.lnk则寻找到对应的exe
-                        WshShell shell_ = new WshShell();
-                        IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
-                        filePath = shortcut_.TargetPath;
-
-                        //判断快捷方式是exe还是目录
-                        if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
-                        {
-                            //成功逻辑
-                            remoteAppPath.Text= filePath;
-
-                        }
-                        else
-                        {
-                            AduMessageBox.Show($"请选择可执行文件的快捷方式！");
-                        }
-                    }
+                    // 你可以设置图标路径文本框的内容
+                    remoteAppPath.Text = openFileDialog.FileName;
                 }
                 else
                 {
-                    AduMessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
+                    AduMessageBox.Show($"请选择可执行文件！");
                 }
             }
         }
 
         private void OpenAppIconPath_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "可执行文件 (*.exe;*.lnk)|*.exe;*.lnk|所有文件 (*.*)|*.*";
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            if (openFileDialog.ShowDialog() == true)
-            {
-                string filePath = openFileDialog.FileName;
-
-                // 检查文件扩展名是否为 .exe 或 .lnk
-                string extension = System.IO.Path.GetExtension(filePath).ToLowerInvariant();
-                if (extension.Equals(".exe") || extension.Equals(".lnk"))
-                {
-                    if (extension.Equals(".lnk"))
-                    {
-                        //如果是.lnk则寻找到对应的exe
-                        WshShell shell_ = new WshShell();
-                        IWshShortcut shortcut_ = (IWshShortcut)shell_.CreateShortcut(filePath);
-                        filePath = shortcut_.TargetPath;
-
-                        //判断快捷方式是exe还是目录
-                        if (System.IO.File.Exists(filePath) && System.IO.Path.GetExtension(filePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
-                        {
-                            //成功逻辑
-                            remoteAppPath.Text = filePath;
-
-                        }
-                        else
-                        {
-                            AduMessageBox.Show($"请选择可执行文件的快捷方式！");
-                        }
-                    }
-                }
-                else
-                {
-                    AduMessageBox.Show($"请选择以 .exe 或 .lnk 结尾的文件！");
-                }
-            }
+            BrowseIcon BrowseIconWindow = new BrowseIcon();
+            BrowseIconWindow.Owner = this;
+            BrowseIconWindow.ShowDialog();
         }
 
 
 
+
+        public void SetIconData(string path, string index)
+        {
+            // 在这里处理接收到的图标路径和索引数据
+            // 例如，设置MainWindow中的相关控件的值
+            // 示例代码：
+            remoteAppIconPath.Text = path;
+            remoteAppIconIndex.Text = index;
+        }
     }
 
-
+        
 
 }

@@ -559,10 +559,6 @@ namespace remoteApp_win.UserControls
                             }
 
 
-
-                                
-
-
                                 shortcutImage.Source = bitmapSource;
 
                                 shortcutImage.Width = 32;
@@ -584,7 +580,7 @@ namespace remoteApp_win.UserControls
                                 stackPanel.Children.Add(shortcutText);
                                 stackPanel.AppPath = filePath;
                                 stackPanel.AppName = shortcutName;
-                                stackPanel.AppIconPath = iconLocation;//TODO
+                                stackPanel.AppIconPath = iconLocation;
 
 
                                 //给远程应用添加右下角角标
@@ -694,6 +690,9 @@ namespace remoteApp_win.UserControls
 
 
             AddRemoteApp RemoteAppWindow = new AddRemoteApp();
+            // 设置 AddRemoteApp 窗口的 Owner 为当前 MainWindow
+
+            
             RemoteAppWindow.ShowDialog();
 
         }

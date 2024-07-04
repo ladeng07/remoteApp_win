@@ -147,20 +147,25 @@ namespace IconDisplayApp
                     Icon icon;
                     BitmapSource bitmapSource;
                     if (hIcons.Length > 0) { //针对exe
-                        icon = System.Drawing.Icon.FromHandle(hIcons[0]);
-                        bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                        try
+                        {
+                            icon = System.Drawing.Icon.FromHandle(hIcons[0]);
+                            bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                                       icon.Handle,
                                       Int32Rect.Empty,
                                       BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                        }
+                        catch (Exception)
+                        {
+                            //处理某些应用传递icon空句柄（向日葵）
+                            bitmapSource = GetBitmapSourceFromIcon(finalLocation);
+                        }
+                        
                     }
                     else {  //针对Icon
                         bitmapSource = GetBitmapSourceFromIcon(finalLocation);
                         
                     }
-
-
-
-
 
                     shortcutImage.Source = bitmapSource;
                     shortcutImage.Width = 32;

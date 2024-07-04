@@ -1,4 +1,4 @@
-﻿<Window x:Class="remoteApp_win.Views.BrowseIcon"
+﻿<AduSkin:MetroWindow x:Class="remoteApp_win.Views.BrowseIcon"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,24 +6,51 @@
         xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
         xmlns:local="clr-namespace:remoteApp_win.Views"
         mc:Ignorable="d"
-        Title="BrowseIcon" Height="450" Width="800">
+        Title="浏览图标" Height="450" Width="800"  Icon="/logo.png" >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-       
-            
-            <AduSkin:MetroTextBox Grid.Column="0" x:Name="r0"  />
-        <AduSkin:MetroTextBlock Grid.Column="1" x:Name="r1" Text="aaa" />
-        <AduSkin:MetroTextBox  Grid.Column="2" x:Name="r2"   />
+
+        <AduSkin:AduFlatButton Grid.Column="0" Name="Browse_Icon" Content="浏览图标" Click="BrowseIcon_Click"/>
+        <AduSkin:MetroTextBox  Grid.Column="1" x:Name="iconPath" IsReadOnly="True"/>
+        <AduSkin:AduFormLable Grid.Column="2"  Title="图标索引">
+            <AduSkin:MetroTextBox x:Name="iconIndex" IsReadOnly="True"/>
+        </AduSkin:AduFormLable>
+
+        <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource ShowControlBorder}"   CornerRadius="5" Margin="10,10,10,10">
         
+         
+                
+
+
+               
+
+                <!-- 第二行放置WrapPanel -->
+                <ScrollViewer   Template="{StaticResource ScrollViewerControlTemplate}" VerticalScrollBarVisibility="Auto">
+
+                    <WrapPanel  x:Name="IconWrapPanel" 
+                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                        <!-- 在这里添加 WrapPanel 中的内容 -->
+                    </WrapPanel>
+                </ScrollViewer>
+           
+
+        </Border>
+
+
+        <StackPanel Grid.ColumnSpan="3" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <AduSkin:AduFlatButton Content="取消" Width="80" Margin="5" Click="Cancel_Click"/>
+            <AduSkin:AduFlatButton Content="保存" Width="80" Margin="5" Click="Save_Click"/>
+        </StackPanel>
 
     </Grid>
-</Window>
+</AduSkin:MetroWindow>
