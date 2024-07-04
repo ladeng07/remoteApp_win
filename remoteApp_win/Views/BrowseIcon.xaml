@@ -14,15 +14,15 @@
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
 
 
         <AduSkin:AduFlatButton Grid.Column="0" Name="Browse_Icon" Content="浏览图标" Click="BrowseIcon_Click"/>
-        <AduSkin:MetroTextBox  Grid.Column="1" x:Name="iconPath" IsReadOnly="True"/>
-        <AduSkin:AduFormLable Grid.Column="2"  Title="图标索引">
+        <AduSkin:MetroTextBox  Grid.Column="1" x:Name="iconPath" IsReadOnly="True" Margin="0,10,0,10"/>
+        <AduSkin:AduFormLable Grid.Column="2"  Title="图标索引"  Margin="5,10,0,10">
             <AduSkin:MetroTextBox x:Name="iconIndex" IsReadOnly="True"/>
         </AduSkin:AduFormLable>
 

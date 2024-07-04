@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -13,10 +14,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using AduSkin.Controls.Metro;
+using IconDisplayApp;
+using Newtonsoft.Json;
 using IWshRuntimeLibrary;
 using Microsoft.Win32;
+using remoteApp_win.ViewModel;
+using remoteApp_win;
 using remoteApp_win.Views;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static remoteApp_win.UserControls.AppList;
+using Image = System.Windows.Controls.Image;
 
 
 namespace AddRemoteAppSP
@@ -26,6 +33,7 @@ namespace AddRemoteAppSP
     /// </summary>
     public partial class AddRemoteApp : MetroWindow
     {
+        public Image shortcutImage;
         public AddRemoteApp()
         {
             InitializeComponent();
@@ -56,15 +64,51 @@ namespace AddRemoteAppSP
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            AppStackPanel_ childdStackPanel = new AppStackPanel_();
-            childdStackPanel.AppPath = remoteAppPath.Text;
-            childdStackPanel.AppName = remoteAppName.Text;
-            childdStackPanel.AppIconPath = remoteAppIconPath.Text;
-            //childdStackPanel.AppIcon = clickedStackPanel.AppIcon;
+            if (!CheckInputs()) return;
 
+            AppStackPanel_ childdStackPanel = new AppStackPanel_ {
+                AppPath = remoteAppPath.Text,
+                AppName = remoteAppName.Text,
+                AppIconPath = remoteAppIconPath.Text.EndsWith(".ico", StringComparison.OrdinalIgnoreCase)? remoteAppIconPath.Text : remoteAppIconPath.Text+","+remoteAppIconIndex.Text,
+                AppIcon = "",
+                Orientation = Orientation.Vertical,
+            };
 
-            // 保存按钮的点击事件处理逻辑
-            MessageBox.Show("保存成功");
+            TextBlock shortcutText = new TextBlock();
+            shortcutText.Text = childdStackPanel.AppName;
+            shortcutText.TextWrapping = TextWrapping.Wrap; // 设置自动换行
+            shortcutText.TextAlignment = TextAlignment.Center; // 将文本水平对齐设置为居中
+            shortcutText.Width = 60;
+            shortcutText.MaxHeight = 4 * shortcutText.FontSize;
+            shortcutText.TextTrimming = TextTrimming.CharacterEllipsis;
+            shortcutText.Margin = new Thickness(10);
+
+            Panel parentPanel = shortcutImage.Parent as Panel;
+            parentPanel.Children.Remove(shortcutImage);
+
+            childdStackPanel.Children.Add(shortcutImage);
+            childdStackPanel.Children.Add(shortcutText);
+
+            //给远程应用添加右下角角标
+            BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+            BitmapSource combinedBitmap = AddIconToBitmap((BitmapSource)shortcutImage.Source, iconSource, 24); // 24x24 icon size
+
+            childdStackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+
+            //获取MainWindow实例
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+            //获取数据上下文
+            MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+            UserControl myUserControl = viewModel.Page1;
+            WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+            AppWrapPanel.Children.Add(childdStackPanel);
+
+            //刷新list.json
+            WriteAppWrapPanelContentsToFile();
+
+            this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -106,16 +150,100 @@ namespace AddRemoteAppSP
 
 
 
-        public void SetIconData(string path, string index)
+        public void SetIconData(string path, string index,Image im)
         {
             // 在这里处理接收到的图标路径和索引数据
             // 例如，设置MainWindow中的相关控件的值
             // 示例代码：
             remoteAppIconPath.Text = path;
             remoteAppIconIndex.Text = index;
+            shortcutImage = im;
+        }
+
+        private bool CheckInputs()
+        {
+            if (string.IsNullOrEmpty(remoteAppName.Text))
+            {
+                AduMessageBox.Show("应用名称不能为空！");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(remoteAppPath.Text))
+            {
+                AduMessageBox.Show("应用路径不能为空！");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(remoteAppIconPath.Text))
+            {
+                AduMessageBox.Show("图标路径不能为空！");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(remoteAppIconIndex.Text))
+            {
+                AduMessageBox.Show("图标索引不能为空！");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void WriteAppWrapPanelContentsToFile()
+        {
+            StringBuilder contents = new StringBuilder();
+
+            //获取MainWindow实例
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+
+            //获取数据上下文
+            MainViewModel viewModel = mainWindow.DataContext as MainViewModel;
+            UserControl myUserControl = viewModel.Page1;
+            WrapPanel AppWrapPanel = myUserControl.FindName("AppWrapPanel") as WrapPanel;
+
+            List<AppInfo> appInfoList = new List<AppInfo>();
+            // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
+            foreach (UIElement element in AppWrapPanel.Children)
+            {
+                AppStackPanel stackPanel = element as AppStackPanel;
+                if (stackPanel != null)
+                {
+                    AppInfo appInfo = new AppInfo
+                    {
+                        Name = stackPanel.AppName,
+                        Path = stackPanel.AppPath,
+                        IconPath = stackPanel.AppIconPath,
+                        Icon = stackPanel.AppIcon
+                    };
+
+                    appInfoList.Add(appInfo);
+                }
+            }
+            string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
+            // 将 StringBuilder 中的内容写入文件
+
+            string fileName = "list.json";
+            System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
+        }
+
+        private string ImageSourceToBase64(ImageSource imageSource)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                if (imageSource == null)
+                {   // TODO
+                    // 当ImageSource为空时，返回一个空字符串或者其他默认处理
+                    return string.Empty; // 或者返回一个默认图片的Base64编码
+                }
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource));
+                encoder.Save(memoryStream);
+                byte[] imageBytes = memoryStream.ToArray();
+                return Convert.ToBase64String(imageBytes);
+            }
         }
     }
 
-        
+
 
 }

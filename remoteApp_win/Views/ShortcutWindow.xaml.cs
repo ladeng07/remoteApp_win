@@ -219,7 +219,7 @@ namespace IconDisplayApp
 
                     //给远程应用添加右下角角标
                     BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
-                    BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+                    BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 24); // 24x24 icon size
 
                     stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
 
@@ -373,19 +373,6 @@ namespace IconDisplayApp
             }
             return instance;
         }
-
-        //public static void ShowWindow(List<List<string>> shortcutFilesList)
-        //{
-        //    var window = Instance(shortcutFilesList);
-        //    if (!window.IsVisible)
-        //    {
-        //        window.ShowDialog();
-        //    }
-        //    else
-        //    {
-        //        window.Activate(); // 如果窗口已经显示，则激活窗口
-        //    }
-        //}
 
 
         private string FixPath(string targetPath)

@@ -6,11 +6,11 @@
         xmlns:AduSkin="clr-namespace:AduSkin.Controls.Metro;assembly=AduSkin" 
         xmlns:local="clr-namespace:AddRemoteAppSP"
         mc:Ignorable="d"
-        Title="新建远程应用" Height="450" Width="400"  Icon="/logo.png" ResizeMode="NoResize">
+        Title="新建远程应用" Height="450" Width="500"  Icon="/logo.png" ResizeMode="NoResize">
     
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="350"/>
+            <RowDefinition Height="300"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel>
@@ -31,9 +31,9 @@
         </StackPanel >
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <AduSkin:AduFlatButton Content="保存" Width="80" Margin="5" Click="Save_Click"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom">
             <AduSkin:AduFlatButton Content="取消" Width="80" Margin="5" Click="Cancel_Click"/>
+            <AduSkin:AduFlatButton Content="保存" Width="80" Margin="5" Click="Save_Click"/>
         </StackPanel>
     </Grid>
 </AduSkin:MetroWindow>

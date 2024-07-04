@@ -414,18 +414,21 @@ namespace remoteApp_win.UserControls
         {
             string[] splitPath = iconPath.Split(',');
             string filePath = splitPath[0];
-            int iconIndex = splitPath.Length > 1 ? int.Parse(splitPath[1]) : 0;
+            try
+            {//防止传入非法的地址
+                int iconIndex = splitPath.Length > 1 ? int.Parse(splitPath[1]) : 0;
+                IntPtr hIcon = ExtractIconFromFile(filePath, iconIndex);
+                if (hIcon == IntPtr.Zero) return null;
 
-            IntPtr hIcon = ExtractIconFromFile(filePath, iconIndex);
-            if (hIcon == IntPtr.Zero) return null;
+                BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                    hIcon,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
 
-            BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                hIcon,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-
-            DestroyIcon(hIcon);
-            return bitmapSource;
+                DestroyIcon(hIcon);
+                return bitmapSource;
+            }catch(Exception ex) { return null; }
+            
         }
 
         [DllImport("Shell32.dll", CharSet = CharSet.Auto)]

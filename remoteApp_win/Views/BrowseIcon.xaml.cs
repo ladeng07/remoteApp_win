@@ -27,11 +27,12 @@ namespace remoteApp_win.Views
     /// </summary>
     public partial class BrowseIcon : MetroWindow
     {
-
+        public Image shortcutImage { get; set; }
         public class IconStackPanel : StackPanel
         {
             public string iconName { get; set; }
             public string iconPath { get; set; }
+            
 
             public static readonly DependencyProperty IsSelectedProperty =
                 DependencyProperty.Register("IsSelected", typeof(bool), typeof(IconStackPanel), new PropertyMetadata(false, OnIsSelectedChanged));
@@ -69,6 +70,7 @@ namespace remoteApp_win.Views
         public BrowseIcon()
         {
             InitializeComponent();
+            
         }
 
         private void BrowseIcon_Click(object sender, RoutedEventArgs e)
@@ -91,6 +93,8 @@ namespace remoteApp_win.Views
                     IconWrapPanel.Children.Clear();
 
                     List<int> iconIndexes = GetIconIndexes(filePath);
+                    Image tempImage = null;
+
                     foreach (int index in iconIndexes)
                     {
                         IconStackPanel iconItem = new IconStackPanel {
@@ -98,7 +102,7 @@ namespace remoteApp_win.Views
                             iconPath = iconPath.Text,
                         };
 
-                        Image shortcutImage = new Image(); // 您需要根据路径获取实际图标
+                         // 您需要根据路径获取实际图标
                                                            //选中文件中的图标总数
                         var iconTotalCount = PrivateExtractIcons(filePath, 0, 0, 0, null, null, 0, 0);
 
@@ -112,20 +116,31 @@ namespace remoteApp_win.Views
                         Icon icon; //判断exe还是ico
                         BitmapSource bitmapSource;
                         if (hIcons.Length > 0)
-                        { //添加exe的
-                            icon = System.Drawing.Icon.FromHandle(hIcons[index]);
-                            bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                                icon.Handle,
-                                Int32Rect.Empty,
-                                BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                        { //针对exe
+                            try
+                            {
+                                icon = System.Drawing.Icon.FromHandle(hIcons[index]);
+                                bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                                          icon.Handle,
+                                          Int32Rect.Empty,
+                                          BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                            }
+                            catch (Exception)
+                            {
+                                //处理某些应用传递icon空句柄（向日葵）
+                                bitmapSource = GetBitmapSourceFromIcon(iconItem.iconPath);
+                            }
+
                         }
                         else
-                        { //添加ico
+                        {  //针对Icon
                             bitmapSource = GetBitmapSourceFromIcon(iconItem.iconPath);
+
                         }
 
-
+                        shortcutImage = new Image();
                         shortcutImage.Source = bitmapSource;
+                        if(index == 0) tempImage= shortcutImage;
 
                         shortcutImage.Width = 32;
                         shortcutImage.Height = 32;
@@ -157,6 +172,7 @@ namespace remoteApp_win.Views
                                 }
                                 clickedStackPanel.IsSelected = true;
                                 iconIndex.Text = index.ToString();
+                                shortcutImage = (Image) iconItem.Children[0];
                             }
                         };
 
@@ -164,6 +180,8 @@ namespace remoteApp_win.Views
 
                         IconWrapPanel.Children.Add(iconItem);
                     };
+                    //默认值
+                    shortcutImage = tempImage;
                     iconIndex.Text = "0";
 
                 }
@@ -186,11 +204,12 @@ namespace remoteApp_win.Views
             // 获取需要传递的数据
             string iconPathValue = iconPath.Text;
             string iconIndexValue = iconIndex.Text;
+            
 
             if (Owner is AddRemoteApp AddRemoteAppWindow)
             {
                 // 假设 MainWindow 有一个方法来接收图标路径和索引
-                AddRemoteAppWindow.SetIconData(iconPath.Text, iconIndex.Text);
+                AddRemoteAppWindow.SetIconData(iconPath.Text, iconIndex.Text, shortcutImage);
             }
 
             // 关闭当前窗口
@@ -204,19 +223,24 @@ namespace remoteApp_win.Views
         {
             string[] splitPath = iconPath.Split(',');
             string filePath = splitPath[0];
-            int iconIndex = splitPath.Length > 1 ? int.Parse(splitPath[1]) : 0;
+            try
+            {//防止传入非法的地址
+                int iconIndex = splitPath.Length > 1 ? int.Parse(splitPath[1]) : 0;
+                IntPtr hIcon = ExtractIconFromFile(filePath, iconIndex);
+                if (hIcon == IntPtr.Zero) return null;
 
-            IntPtr hIcon = ExtractIconFromFile(filePath, iconIndex);
-            if (hIcon == IntPtr.Zero) return null;
+                BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                    hIcon,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
 
-            BitmapSource bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
-                hIcon,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
+                DestroyIcon(hIcon);
+                return bitmapSource;
+            }
+            catch (Exception ex) { return null; }
 
-            DestroyIcon(hIcon);
-            return bitmapSource;
         }
+
         [DllImport("User32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DestroyIcon(IntPtr hIcon);
