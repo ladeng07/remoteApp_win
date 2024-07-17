@@ -8,15 +8,14 @@
         Background="#FFF" BorderThickness="0"
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator},Path=Main}"   
-        Title="云应用分发器Demo" Height="450" Width="800" Icon="/logo.png" MinWidth="280" MinHeight="360">
+        Title="云应用分发器" Height="450" Width="800" Icon="/logo.png" MinWidth="280" MinHeight="360">
 
 
     <AduSkin:MetroWindow.Menu>
         <AduSkin:MetroTitleMenu Height="40" HorizontalAlignment="Right">
             <AduSkin:MetroTitleMenuItem Header="联系" >
-                <AduSkin:MetroMenuItem Header="QQ"  CommandParameter="http://wpa.qq.com/msgrd?v=3&amp;uin=1280429435&amp;site=qq&amp;menu=yes"/>
-                <AduSkin:MetroMenuItem Header="QQ群"  CommandParameter="https://jq.qq.com/?_wv=1027&amp;k=57GYQeb"/>
-                <AduSkin:MetroMenuItem Header="邮箱"  CommandParameter="mailto:1280429435@qq.com" />
+                <AduSkin:MetroMenuItem Header="QQ"  CommandParameter="http://wpa.qq.com/msgrd?v=3&amp;uin=2312936963&amp;site=qq&amp;menu=yes"/>
+                <AduSkin:MetroMenuItem Header="邮箱"  CommandParameter="mailto:2312936963@qq.com" />
             </AduSkin:MetroTitleMenuItem>
         </AduSkin:MetroTitleMenu>
     </AduSkin:MetroWindow.Menu>

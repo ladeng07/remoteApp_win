@@ -89,12 +89,18 @@ namespace IconDisplayApp
 
 
     }
+
+
     public partial class ShortcutWindow : MetroWindow
     {
+        private readonly string configFilePath = "config.ini";
+        bool isRemoteTagEnabled;
         public ShortcutWindow(List<List<string>> shortcutFiles)
         {
             InitializeComponent();
+            isRemoteTagEnabled = LoadConfigSettings(); 
             DisplayShortcuts(shortcutFiles);
+
 
             // 将传入的参数保存到窗口的实例中
             DataContext = shortcutFiles;
@@ -217,11 +223,19 @@ namespace IconDisplayApp
                     stackPanel.AppName = shortcutName;
                     stackPanel.AppIconPath = finalLocation;
 
-                    //给远程应用添加右下角角标
-                    BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
-                    BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 24); // 24x24 icon size
+                    if (isRemoteTagEnabled)
+                    {
+                        //给远程应用添加右下角角标
+                        BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+                        BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 24); // 24x24 icon size
 
-                    stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+                        stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+
+                    }
+                    else
+                    {
+                        stackPanel.AppIcon = ImageSourceToBase64(bitmapSource);
+                    }
 
                     //获取当前桌面下标
                     int temp = currentPanelIndex;
@@ -275,6 +289,23 @@ namespace IconDisplayApp
                 }
                 currentPanelIndex++;
             }
+        }
+
+        private bool LoadConfigSettings()
+        {
+            if (System.IO.File.Exists(configFilePath))
+            {
+                var lines = System.IO.File.ReadAllLines(configFilePath);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("RemoteTagEnabled"))
+                    {
+                        var value = line.Split('=')[1].Trim();
+                        return value == "1";
+                    }
+                }
+            }
+            return false;
         }
 
         //从图标获取位图

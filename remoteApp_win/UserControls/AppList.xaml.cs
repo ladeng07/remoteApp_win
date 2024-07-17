@@ -33,10 +33,14 @@ namespace remoteApp_win.UserControls
     /// </summary>
     public partial class AppList : UserControl
     {
+        private readonly string configFilePath = "config.ini";
+        bool isRemoteTagEnabled;
         public AppList()
         {
             InitializeComponent();
+            isRemoteTagEnabled = LoadConfigSettings();
             LoadAppInfoList();
+
 
         }
 
@@ -302,7 +306,7 @@ namespace remoteApp_win.UserControls
                                     
                                     if (uninstallString != null)
                                     {
-                                        AduMessageBox.Show(uninstallString.ToString());
+                                        //AduMessageBox.Show(uninstallString.ToString());
                                         return uninstallString.ToString();
                                     }
                                 }
@@ -410,6 +414,22 @@ namespace remoteApp_win.UserControls
             }
         }
 
+        private bool LoadConfigSettings()
+        {
+            if (System.IO.File.Exists(configFilePath))
+            {
+                var lines = System.IO.File.ReadAllLines(configFilePath);
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("RemoteTagEnabled"))
+                    {
+                        var value = line.Split('=')[1].Trim();
+                        return value == "1";
+                    }
+                }
+            }
+            return false;
+        }
         private BitmapSource GetBitmapSourceFromIcon(string iconPath)
         {
             string[] splitPath = iconPath.Split(',');
@@ -556,10 +576,10 @@ namespace remoteApp_win.UserControls
                                         icon.Handle,
                                         Int32Rect.Empty,
                                         BitmapSizeOptions.FromWidthAndHeight(64, 64));
-                            }
+                                }
                                 else { //添加ico
                                     bitmapSource = GetBitmapSourceFromIcon(iconLocation);
-                            }
+                                }
 
 
                                 shortcutImage.Source = bitmapSource;
@@ -586,11 +606,19 @@ namespace remoteApp_win.UserControls
                                 stackPanel.AppIconPath = iconLocation;
 
 
+                            if (isRemoteTagEnabled)
+                            {
                                 //给远程应用添加右下角角标
                                 BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
-                                BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+                                BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 24); // 24x24 icon size
 
                                 stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+
+                            }
+                            else {
+                                stackPanel.AppIcon = ImageSourceToBase64(bitmapSource);
+                            }
+                                
 
                                 // 添加点击事件
                                 stackPanel.DoubleClick += (sender_, e_) =>
@@ -741,6 +769,82 @@ namespace remoteApp_win.UserControls
                         IconPath = stackPanel.AppIconPath,
                         Icon = stackPanel.AppIcon
                     };
+
+                    appInfoList.Add(appInfo);
+                }
+            }
+            string json = JsonConvert.SerializeObject(appInfoList, Formatting.Indented);
+            // 将 StringBuilder 中的内容写入文件
+
+            string fileName = "list.json";
+            System.IO.File.WriteAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName), json);
+        }
+
+        private void FlushAppWrapPanelContentsToFile()
+        {
+            StringBuilder contents = new StringBuilder();
+
+            List<AppInfo> appInfoList = new List<AppInfo>();
+            // 遍历 AppWrapPanel 中的所有元素，将其内容添加到 StringBuilder 中
+            foreach (UIElement element in AppWrapPanel.Children)
+            {
+                AppStackPanel stackPanel = element as AppStackPanel;
+                if (stackPanel != null)
+                {
+                    //选中文件中的图标总数
+                    var iconTotalCount = PrivateExtractIcons(stackPanel.AppPath, 0, 0, 0, null, null, 0, 0);
+
+                    //用于接收获取到的图标指针
+                    IntPtr[] hIcons = new IntPtr[iconTotalCount];
+                    ////对应的图标id
+                    int[] ids = new int[iconTotalCount];
+                    ////成功获取到的图标个数
+                    var successCount = PrivateExtractIcons(stackPanel.AppPath, 0, 64, 64, hIcons, null, iconTotalCount, 0);
+
+
+                    Icon icon; //判断exe还是ico
+                    BitmapSource bitmapSource;
+                    if (hIcons.Length > 0)
+                    { //添加exe的
+                        icon = System.Drawing.Icon.FromHandle(hIcons[0]);
+                        bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
+                            icon.Handle,
+                            Int32Rect.Empty,
+                            BitmapSizeOptions.FromWidthAndHeight(64, 64));
+                    }
+                    else
+                    { //添加ico
+                        bitmapSource = GetBitmapSourceFromIcon(stackPanel.AppIconPath);
+                    }
+
+                    AppInfo appInfo;
+                    if (isRemoteTagEnabled)
+                    {
+                        //给远程应用添加右下角角标
+                        BitmapSource iconSource = new BitmapImage(new Uri("pack://application:,,,/logo.png")); // Replace with your icon path
+                        BitmapSource combinedBitmap = AddIconToBitmap(bitmapSource, iconSource, 16); // 16x16 icon size
+
+                        stackPanel.AppIcon = ImageSourceToBase64(combinedBitmap);
+                        appInfo = new AppInfo
+                        {
+                            Name = stackPanel.AppName,
+                            Path = stackPanel.AppPath,
+                            IconPath = stackPanel.AppIconPath,
+                            Icon = ImageSourceToBase64(combinedBitmap)
+                        };
+
+                    }
+                    else
+                    {
+                        appInfo = new AppInfo
+                        {
+                            Name = stackPanel.AppName,
+                            Path = stackPanel.AppPath,
+                            IconPath = stackPanel.AppIconPath,
+                            Icon = ImageSourceToBase64(bitmapSource)
+                        };
+                    }
+
 
                     appInfoList.Add(appInfo);
                 }

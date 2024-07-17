@@ -29,9 +29,11 @@ namespace remoteApp_win
     public partial class MainWindow : MetroWindow
     {
         private NotifyIconWPF _notifyIcon;
+        private readonly string configFilePath = "config.ini";
         public MainWindow()
         {
             InitializeComponent();
+            CreateConfigFileIfNotExists();
 
             // 创建托盘图标
             _notifyIcon = new NotifyIconWPF();
@@ -49,6 +51,19 @@ namespace remoteApp_win
             contextMenu.MenuItems.Add(exitMenuItem);
 
             _notifyIcon.ContextMenu = contextMenu;
+        }
+
+        private void CreateConfigFileIfNotExists()
+        {
+            if (!System.IO.File.Exists(configFilePath))
+            {
+                // Create the file and write the default setting
+                using (StreamWriter writer = new StreamWriter(configFilePath, false, Encoding.UTF8))
+                {
+                    writer.WriteLine("[Settings]");
+                    writer.WriteLine("RemoteTagEnabled = 1");
+                }
+            }
         }
 
         //托盘图标
